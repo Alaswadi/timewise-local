@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  timewise:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      # Set your Gemini API key here or use .env file
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: unless-stopped
+    container_name: timewise-app
+
+  # Optional: Add a development service for hot reloading
+  timewise-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: unless-stopped
+    container_name: timewise-dev
+    profiles:
+      - dev

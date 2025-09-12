@@ -1,0 +1,273 @@
+{
+    "header": {
+        "title": "تايم وايز",
+        "nav": {
+            "dashboard": "لوحة التحكم",
+            "reports": "التقارير",
+            "list": "القائمة",
+            "calendar": "التقويم",
+            "projects": "المشاريع",
+            "clients": "العملاء",
+            "tasks": "المهام",
+            "settings": "الإعدادات"
+        }
+    },
+    "mobileMenu": {
+        "title": "القائمة"
+    },
+    "timer": {
+        "placeholder": "على ماذا تعمل؟",
+        "startLabel": "بدء الموقت",
+        "stopLabel": "إيقاف الموقت",
+        "selectProject": "اختر مشروع",
+        "selectTask": "اختر مهمة (اختياري)",
+        "billable": "مدفوع",
+        "alertSelectProject": "يرجى اختيار مشروع قبل بدء الموقت."
+    },
+    "dashboard": {
+        "title": "لوحة التحكم",
+        "stats": {
+            "totalTime": "إجمالي وقت اليوم",
+            "billableTime": "الوقت المدفوع",
+            "earnedToday": "أرباح اليوم",
+            "nonBillableTime": "الوقت غير المدفوع"
+        },
+        "today": "اليوم",
+        "thisWeek": "هذا الأسبوع",
+        "noEntries": "لا توجد إدخالات وقت لهذا اليوم حتى الآن."
+    },
+    "timeEntry": {
+        "noProject": "لا يوجد مشروع",
+        "restartLabel": "إعادة تشغيل الموقت لـ {{description}}",
+        "deleteLabel": "حذف الإدخال: {{description}}",
+        "billable": "مدفوع"
+    },
+    "list": {
+        "description": "الوصف",
+        "project": "المشروع",
+        "task": "المهمة",
+        "date": "التاريخ",
+        "duration": "المدة",
+        "earnings": "الأرباح",
+        "actions": "الإجراءات",
+        "notApplicable": "لا ينطبق"
+    },
+    "calendar": {
+        "prevMonth": "الشهر السابق",
+        "nextMonth": "الشهر التالي",
+        "entriesFor": "إدخالات لـ {{date}}",
+        "noEntries": "لا توجد إدخالات لهذا اليوم.",
+        "weekdays": {
+            "s": "ح", "m": "ن", "t": "ث", "w": "ر", "th": "خ", "f": "ج", "sa": "س"
+        }
+    },
+    "projectsPage": {
+        "title": "المشاريع",
+        "description": "إدارة مشاريعك وعملائك.",
+        "addProject": "إضافة مشروع",
+        "projectName": "اسم المشروع",
+        "client": "العميل",
+        "billable": "مدفوع",
+        "rate": "السعر",
+        "actions": "الإجراءات",
+        "yes": "نعم",
+        "no": "لا",
+        "unknownClient": "عميل غير معروف",
+        "editLabel": "تعديل المشروع: {{name}}",
+        "deleteLabel": "حذف المشروع: {{name}}"
+    },
+    "projectModal": {
+        "addTitle": "إضافة مشروع جديد",
+        "editTitle": "تعديل المشروع",
+        "nameLabel": "اسم المشروع",
+        "clientLabel": "العميل",
+        "selectClient": "اختر عميلاً",
+        "isBillableLabel": "هل هذا المشروع مدفوع؟",
+        "rateLabel": "السعر بالساعة ($)",
+        "alert": "اسم المشروع والعميل مطلوبان."
+    },
+    "clientsPage": {
+        "title": "العملاء",
+        "description": "إدارة عملائك.",
+        "addClient": "إضافة عميل",
+        "clientName": "اسم العميل",
+        "actions": "الإجراءات",
+        "editLabel": "تعديل العميل: {{name}}",
+        "deleteLabel": "حذف العميل: {{name}}"
+    },
+    "clientModal": {
+        "addTitle": "إضافة عميل جديد",
+        "editTitle": "تعديل العميل",
+        "nameLabel": "اسم العميل",
+        "alert": "اسم العميل لا يمكن أن يكون فارغًا."
+    },
+    "tasksPage": {
+        "title": "المهام",
+        "description": "إدارة مهامك عبر المشاريع.",
+        "addTask": "إضافة مهمة",
+        "taskName": "اسم المهمة",
+        "project": "المشروع",
+        "actions": "الإجراءات",
+        "unknownProject": "مشروع غير معروف",
+        "editLabel": "تعديل المهمة: {{name}}",
+        "deleteLabel": "حذف المهمة: {{name}}"
+    },
+    "taskModal": {
+        "addTitle": "إضافة مهمة جديدة",
+        "editTitle": "تعديل المهمة",
+        "nameLabel": "اسم المهمة",
+        "projectLabel": "المشروع",
+        "selectProject": "اختر مشروعًا",
+        "alert": "اسم المهمة والمشروع مطلوبان."
+    },
+    "reportsPage": {
+        "title": "التقارير",
+        "description": "حلل استخدام وقتك بتقارير ومخططات تفصيلية.",
+        "tabs": {
+            "summary": "ملخص",
+            "detailed": "مفصل",
+            "compare": "مقارنة"
+        },
+        "timeFilter": {
+            "all": "كل الأوقات",
+            "30days": "آخر 30 يومًا",
+            "quarter": "هذا الربع",
+            "year": "هذا العام"
+        },
+        "summaryTitle": "ملخص",
+        "totalEarningsTitle": "إجمالي الأرباح",
+        "totalTime": "الوقت الإجمالي: {{duration}}",
+        "productivityTitle": "اتجاهات الإنتاجية",
+        "last30days": "آخر 30 يومًا",
+        "projectSummaryTitle": "ملخص المشروع",
+        "projectSummaryHeaders": {
+            "project": "المشروع",
+            "timeSpent": "الوقت المستغرق",
+            "totalEarnings": "إجمالي الأرباح"
+        },
+        "clientSummaryTitle": "ملخص العملاء",
+        "clientSummaryHeaders": {
+            "client": "العميل",
+            "timeLogged": "الوقت المسجل",
+            "totalEarnings": "إجمالي الأرباح"
+        },
+        "detailed": {
+            "title": "تقرير مفصل",
+            "description": "قم بتصفية ومراجعة كل إدخال وقت.",
+            "filters": {
+                "dateRange": "نطاق التاريخ",
+                "from": "من",
+                "to": "إلى",
+                "client": "العميل",
+                "allClients": "كل العملاء",
+                "project": "المشروع",
+                "allProjects": "كل المشاريع",
+                "billable": "حالة الفوترة",
+                "all": "الكل",
+                "billableOnly": "مدفوع",
+                "notBillable": "غير مدفوع"
+            },
+            "summary": {
+                "totalTime": "إجمالي الوقت المسجل",
+                "totalEarnings": "إجمالي الأرباح",
+                "entriesFound": "الإدخالات التي تم العثور عليها"
+            },
+            "tableHeaders": {
+                "date": "التاريخ",
+                "description": "الوصف",
+                "client": "العميل",
+                "project": "المشروع",
+                "duration": "المدة",
+                "earnings": "الأرباح"
+            },
+            "noResults": "لا توجد إدخالات وقت تطابق معايير التصفية الخاصة بك."
+        },
+        "compare": {
+            "title": "تقرير مقارنة",
+            "description": "قارن الأداء بين المشاريع أو العملاء بمرور الوقت.",
+            "controls": {
+                "compareBy": "مقارنة حسب",
+                "projects": "المشاريع",
+                "clients": "العملاء",
+                "dateRange": "نطاق التاريخ",
+                "from": "من",
+                "to": "إلى"
+            },
+            "chartTitle": "مقارنة إجمالي الأرباح",
+            "tableHeaders": {
+                "name": "الاسم",
+                "timeLogged": "الوقت المسجل",
+                "billableTime": "الوقت المدفوع",
+                "totalEarnings": "إجمالي الأرباح"
+            },
+            "noData": "لا توجد بيانات متاحة للمعايير المحددة. جرب نطاقًا زمنيًا مختلفًا."
+        }
+    },
+    "settingsPage": {
+        "title": "الإعدادات",
+        "description": "إدارة مساحة العمل وتفضيلات الحساب.",
+        "tabs": {
+            "preferences": "التفضيلات",
+            "account": "الحساب",
+            "integrations": "التكاملات",
+            "api": "API"
+        },
+        "language": {
+            "title": "اللغة",
+            "description": "اختر لغة عرض التطبيق.",
+            "label": "اللغة"
+        },
+        "general": {
+            "title": "عام"
+        },
+        "timeTracking": {
+            "title": "تتبع الوقت"
+        },
+        "reports": {
+            "title": "التقارير"
+        },
+        "notifications": {
+            "title": "الإشعارات"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "مرحباً بعودتك",
+            "subtitle": "سجل دخولك إلى حساب تايم وايز",
+            "emailOrUsername": "البريد الإلكتروني أو اسم المستخدم",
+            "emailOrUsernamePlaceholder": "أدخل بريدك الإلكتروني أو اسم المستخدم",
+            "password": "كلمة المرور",
+            "passwordPlaceholder": "أدخل كلمة المرور",
+            "signIn": "تسجيل الدخول",
+            "signingIn": "جاري تسجيل الدخول...",
+            "showPassword": "إظهار كلمة المرور",
+            "hidePassword": "إخفاء كلمة المرور",
+            "noAccount": "ليس لديك حساب؟",
+            "signUpHere": "سجل هنا",
+            "errors": {
+                "fixErrors": "يرجى إصلاح الأخطاء التالية:",
+                "emailOrUsernameRequired": "البريد الإلكتروني أو اسم المستخدم مطلوب",
+                "passwordRequired": "كلمة المرور مطلوبة"
+            }
+        },
+        "languageSelector": {
+            "label": "اللغة",
+            "english": "English",
+            "arabic": "العربية"
+        }
+    },
+    "common": {
+        "cancel": "إلغاء",
+        "save": "حفظ"
+    },
+    "app": {
+        "noDescription": "لا يوجد وصف",
+        "alerts": {
+            "clientInUse": "لا يمكن حذف العميل. إنه مرتبط بمشروع واحد أو أكثر. يرجى إعادة تعيين المشاريع أو حذفها أولاً.",
+            "confirmDeleteClient": "هل أنت متأكد أنك تريد حذف هذا العميل؟",
+            "projectInUse": "لا يمكن حذف المشروع. لديه مهمة واحدة أو أكثر مرتبطة به. يرجى إعادة تعيين المهام أو حذفها أولاً.",
+            "confirmDeleteProject": "هل أنت متأكد أنك تريد حذف هذا المشروع؟",
+            "confirmDeleteTask": "هل أنت متأكد أنك تريد حذف هذه المهمة؟"
+        }
+    }
+}

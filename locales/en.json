@@ -1,0 +1,273 @@
+{
+    "header": {
+        "title": "TimeWise",
+        "nav": {
+            "dashboard": "Dashboard",
+            "reports": "Reports",
+            "list": "List",
+            "calendar": "Calendar",
+            "projects": "Projects",
+            "clients": "Clients",
+            "tasks": "Tasks",
+            "settings": "Settings"
+        }
+    },
+    "mobileMenu": {
+        "title": "Menu"
+    },
+    "timer": {
+        "placeholder": "What are you working on?",
+        "startLabel": "Start timer",
+        "stopLabel": "Stop timer",
+        "selectProject": "Select Project",
+        "selectTask": "Select Task (Optional)",
+        "billable": "Billable",
+        "alertSelectProject": "Please select a project before starting the timer."
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "stats": {
+            "totalTime": "Total time today",
+            "billableTime": "Billable time",
+            "earnedToday": "Earned today",
+            "nonBillableTime": "Non-billable time"
+        },
+        "today": "Today",
+        "thisWeek": "This week",
+        "noEntries": "No time entries for today yet."
+    },
+    "timeEntry": {
+        "noProject": "No Project",
+        "restartLabel": "Restart timer for {{description}}",
+        "deleteLabel": "Delete entry: {{description}}",
+        "billable": "Billable"
+    },
+    "list": {
+        "description": "Description",
+        "project": "Project",
+        "task": "Task",
+        "date": "Date",
+        "duration": "Duration",
+        "earnings": "Earnings",
+        "actions": "Actions",
+        "notApplicable": "N/A"
+    },
+    "calendar": {
+        "prevMonth": "Previous month",
+        "nextMonth": "Next month",
+        "entriesFor": "Entries for {{date}}",
+        "noEntries": "No entries for this day.",
+        "weekdays": {
+            "s": "S", "m": "M", "t": "T", "w": "W", "th": "T", "f": "F", "sa": "S"
+        }
+    },
+    "projectsPage": {
+        "title": "Projects",
+        "description": "Manage your projects and clients.",
+        "addProject": "Add Project",
+        "projectName": "Project Name",
+        "client": "Client",
+        "billable": "Billable",
+        "rate": "Rate",
+        "actions": "Actions",
+        "yes": "Yes",
+        "no": "No",
+        "unknownClient": "Unknown Client",
+        "editLabel": "Edit project: {{name}}",
+        "deleteLabel": "Delete project: {{name}}"
+    },
+    "projectModal": {
+        "addTitle": "Add New Project",
+        "editTitle": "Edit Project",
+        "nameLabel": "Project Name",
+        "clientLabel": "Client",
+        "selectClient": "Select a client",
+        "isBillableLabel": "Is this project billable?",
+        "rateLabel": "Hourly Rate ($)",
+        "alert": "Project name and client are required."
+    },
+    "clientsPage": {
+        "title": "Clients",
+        "description": "Manage your clients.",
+        "addClient": "Add Client",
+        "clientName": "Client Name",
+        "actions": "Actions",
+        "editLabel": "Edit client: {{name}}",
+        "deleteLabel": "Delete client: {{name}}"
+    },
+    "clientModal": {
+        "addTitle": "Add New Client",
+        "editTitle": "Edit Client",
+        "nameLabel": "Client Name",
+        "alert": "Client name cannot be empty."
+    },
+    "tasksPage": {
+        "title": "Tasks",
+        "description": "Manage your tasks across projects.",
+        "addTask": "Add Task",
+        "taskName": "Task Name",
+        "project": "Project",
+        "actions": "Actions",
+        "unknownProject": "Unknown Project",
+        "editLabel": "Edit task: {{name}}",
+        "deleteLabel": "Delete task: {{name}}"
+    },
+    "taskModal": {
+        "addTitle": "Add New Task",
+        "editTitle": "Edit Task",
+        "nameLabel": "Task Name",
+        "projectLabel": "Project",
+        "selectProject": "Select a project",
+        "alert": "Task name and project are required."
+    },
+    "reportsPage": {
+        "title": "Reports",
+        "description": "Analyze your time usage with detailed reports and charts.",
+        "tabs": {
+            "summary": "Summary",
+            "detailed": "Detailed",
+            "compare": "Compare"
+        },
+        "timeFilter": {
+            "all": "All Time",
+            "30days": "Last 30 Days",
+            "quarter": "This Quarter",
+            "year": "This Year"
+        },
+        "summaryTitle": "Summary",
+        "totalEarningsTitle": "Total Earnings",
+        "totalTime": "Total Time: {{duration}}",
+        "productivityTitle": "Productivity Trends",
+        "last30days": "Last 30 Days",
+        "projectSummaryTitle": "Project Summary",
+        "projectSummaryHeaders": {
+            "project": "Project",
+            "timeSpent": "Time Spent",
+            "totalEarnings": "Total Earnings"
+        },
+        "clientSummaryTitle": "Client Summary",
+        "clientSummaryHeaders": {
+            "client": "Client",
+            "timeLogged": "Time Logged",
+            "totalEarnings": "Total Earnings"
+        },
+        "detailed": {
+            "title": "Detailed Report",
+            "description": "Filter and review every time entry.",
+            "filters": {
+                "dateRange": "Date Range",
+                "from": "From",
+                "to": "To",
+                "client": "Client",
+                "allClients": "All Clients",
+                "project": "Project",
+                "allProjects": "All Projects",
+                "billable": "Billable Status",
+                "all": "All",
+                "billableOnly": "Billable",
+                "notBillable": "Non-Billable"
+            },
+            "summary": {
+                "totalTime": "Total Time Logged",
+                "totalEarnings": "Total Earnings",
+                "entriesFound": "Entries Found"
+            },
+            "tableHeaders": {
+                "date": "Date",
+                "description": "Description",
+                "client": "Client",
+                "project": "Project",
+                "duration": "Duration",
+                "earnings": "Earnings"
+            },
+            "noResults": "No time entries match your filter criteria."
+        },
+        "compare": {
+            "title": "Comparison Report",
+            "description": "Compare performance between projects or clients over time.",
+            "controls": {
+                "compareBy": "Compare by",
+                "projects": "Projects",
+                "clients": "Clients",
+                "dateRange": "Date Range",
+                "from": "From",
+                "to": "To"
+            },
+            "chartTitle": "Comparison of Total Earnings",
+            "tableHeaders": {
+                "name": "Name",
+                "timeLogged": "Time Logged",
+                "billableTime": "Billable Time",
+                "totalEarnings": "Total Earnings"
+            },
+            "noData": "No data available for the selected criteria. Try a different date range."
+        }
+    },
+    "settingsPage": {
+        "title": "Settings",
+        "description": "Manage your workspace and account preferences.",
+        "tabs": {
+            "preferences": "Preferences",
+            "account": "Account",
+            "integrations": "Integrations",
+            "api": "API"
+        },
+        "language": {
+            "title": "Language",
+            "description": "Choose the display language for the application.",
+            "label": "Language"
+        },
+        "general": {
+            "title": "General"
+        },
+        "timeTracking": {
+            "title": "Time tracking"
+        },
+        "reports": {
+            "title": "Reports"
+        },
+        "notifications": {
+            "title": "Notifications"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Welcome Back",
+            "subtitle": "Sign in to your TimeWise account",
+            "emailOrUsername": "Email or Username",
+            "emailOrUsernamePlaceholder": "Enter your email or username",
+            "password": "Password",
+            "passwordPlaceholder": "Enter your password",
+            "signIn": "Sign In",
+            "signingIn": "Signing In...",
+            "showPassword": "Show password",
+            "hidePassword": "Hide password",
+            "noAccount": "Don't have an account?",
+            "signUpHere": "Sign up here",
+            "errors": {
+                "fixErrors": "Please fix the following errors:",
+                "emailOrUsernameRequired": "Email or username is required",
+                "passwordRequired": "Password is required"
+            }
+        },
+        "languageSelector": {
+            "label": "Language",
+            "english": "English",
+            "arabic": "العربية"
+        }
+    },
+    "common": {
+        "cancel": "Cancel",
+        "save": "Save"
+    },
+    "app": {
+        "noDescription": "No description",
+        "alerts": {
+            "clientInUse": "Cannot delete client. They are associated with one or more projects. Please reassign or delete the projects first.",
+            "confirmDeleteClient": "Are you sure you want to delete this client?",
+            "projectInUse": "Cannot delete project. It has one or more tasks associated with it. Please reassign or delete the tasks first.",
+            "confirmDeleteProject": "Are you sure you want to delete this project?",
+            "confirmDeleteTask": "Are you sure you want to delete this task?"
+        }
+    }
+}
