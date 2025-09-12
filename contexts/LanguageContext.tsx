@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
+console.log('LanguageContext.tsx loaded');
+
 // No longer importing JSON directly. We will fetch it.
 
 export type Language = 'en' | 'ar';
@@ -16,36 +18,81 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const translationCache: { en?: any; ar?: any } = {};
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('LanguageProvider component mounted');
   const [language, setLanguage] = useState<Language>('en');
   const [translations, setTranslations] = useState<{ en?: any; ar?: any }>(translationCache);
 
   useEffect(() => {
     const fetchTranslations = async () => {
-      // Only fetch if not already in cache
-      if (!translationCache.en || !translationCache.ar) {
-        try {
-          const [enRes, arRes] = await Promise.all([
-            fetch('/locales/en.json'),
-            fetch('/locales/ar.json')
-          ]);
+      try {
+        console.log('🔄 Starting translation fetch...');
 
-          if (!enRes.ok || !arRes.ok) {
-            throw new Error(`HTTP error! EN: ${enRes.status}, AR: ${arRes.status}`);
-          }
+        // Test fetch with detailed logging
+        const enResponse = await fetch('/locales/en.json');
+        console.log('📥 EN Response received:', {
+          status: enResponse.status,
+          statusText: enResponse.statusText,
+          contentType: enResponse.headers.get('content-type'),
+          url: enResponse.url,
+          ok: enResponse.ok
+        });
 
-          const enData = await enRes.json();
-          const arData = await arRes.json();
-
-          // Store in cache and state
-          translationCache.en = enData;
-          translationCache.ar = arData;
-          setTranslations({ en: enData, ar: arData });
-
-        } catch (error) {
-          console.error("Failed to load translations:", error);
+        if (!enResponse.ok) {
+          throw new Error(`EN fetch failed: ${enResponse.status} ${enResponse.statusText}`);
         }
+
+        const enText = await enResponse.text();
+        console.log('📄 EN Text received (length:', enText.length, ')');
+        console.log('📄 EN Text preview:', enText.substring(0, 100));
+
+        // Check if it's actually JSON
+        if (!enText.trim().startsWith('{')) {
+          console.error('❌ EN response is not JSON! First 500 chars:', enText.substring(0, 500));
+          throw new Error('EN response is not JSON');
+        }
+
+        const enData = JSON.parse(enText);
+        console.log('✅ EN JSON parsed successfully');
+
+        // Now try Arabic
+        const arResponse = await fetch('/locales/ar.json');
+        console.log('📥 AR Response received:', {
+          status: arResponse.status,
+          statusText: arResponse.statusText,
+          contentType: arResponse.headers.get('content-type'),
+          url: arResponse.url,
+          ok: arResponse.ok
+        });
+
+        if (!arResponse.ok) {
+          throw new Error(`AR fetch failed: ${arResponse.status} ${arResponse.statusText}`);
+        }
+
+        const arText = await arResponse.text();
+        console.log('📄 AR Text received (length:', arText.length, ')');
+        console.log('📄 AR Text preview:', arText.substring(0, 100));
+
+        // Check if it's actually JSON
+        if (!arText.trim().startsWith('{')) {
+          console.error('❌ AR response is not JSON! First 500 chars:', arText.substring(0, 500));
+          throw new Error('AR response is not JSON');
+        }
+
+        const arData = JSON.parse(arText);
+        console.log('✅ AR JSON parsed successfully');
+
+        // Store in cache and state
+        translationCache.en = enData;
+        translationCache.ar = arData;
+        setTranslations({ en: enData, ar: arData });
+
+        console.log('🎉 All translations loaded successfully!');
+
+      } catch (error) {
+        console.error("💥 Failed to load translations:", error);
       }
     };
+
     fetchTranslations();
   }, []); // Run only once on mount
 
