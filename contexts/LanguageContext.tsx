@@ -25,12 +25,17 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (!translationCache.en || !translationCache.ar) {
         try {
           const [enRes, arRes] = await Promise.all([
-            fetch('./locales/en.json'),
-            fetch('./locales/ar.json')
+            fetch('/locales/en.json'),
+            fetch('/locales/ar.json')
           ]);
+
+          if (!enRes.ok || !arRes.ok) {
+            throw new Error(`HTTP error! EN: ${enRes.status}, AR: ${arRes.status}`);
+          }
+
           const enData = await enRes.json();
           const arData = await arRes.json();
-          
+
           // Store in cache and state
           translationCache.en = enData;
           translationCache.ar = arData;
