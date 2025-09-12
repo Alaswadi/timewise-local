@@ -27,8 +27,15 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         console.log('🔄 Starting translation fetch...');
 
-        // Test fetch with detailed logging
-        const enResponse = await fetch('/locales/en.json');
+        // Test fetch with cache busting and detailed logging
+        const timestamp = Date.now();
+        const enResponse = await fetch(`/locales/en.json?t=${timestamp}`, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         console.log('📥 EN Response received:', {
           status: enResponse.status,
           statusText: enResponse.statusText,
@@ -54,8 +61,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const enData = JSON.parse(enText);
         console.log('✅ EN JSON parsed successfully');
 
-        // Now try Arabic
-        const arResponse = await fetch('/locales/ar.json');
+        // Now try Arabic with cache busting
+        const arResponse = await fetch(`/locales/ar.json?t=${timestamp}`, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         console.log('📥 AR Response received:', {
           status: arResponse.status,
           statusText: arResponse.statusText,
