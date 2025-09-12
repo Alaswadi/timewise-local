@@ -1,0 +1,7 @@
+/* Basic CSS file to prevent 404 errors */
+/* The main styling is handled by Tailwind CSS in the components */
+
+body {
+  margin: 0;
+  padding: 0;
+}
