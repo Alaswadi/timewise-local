@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { TimeEntry, Project, Client, ProjectReport } from '../types';
 import { formatCurrency, formatDuration, calculateEntryEarnings, getWeeklyEarnings } from '../utils/time';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useUserPreferences } from '../contexts/UserPreferencesContext';
 
 interface SummaryReportProps {
     entries: TimeEntry[];
@@ -11,6 +12,7 @@ interface SummaryReportProps {
 
 export const SummaryReport: React.FC<SummaryReportProps> = ({ entries, projects, clients }) => {
     const { t, language } = useLanguage();
+    const { preferences } = useUserPreferences();
 
     const totalHours = useMemo(() => entries.reduce((acc, e) => acc + (e.endTime - e.startTime), 0), [entries]);
     
@@ -18,8 +20,38 @@ export const SummaryReport: React.FC<SummaryReportProps> = ({ entries, projects,
         return entries.reduce((acc, entry) => acc + calculateEntryEarnings(entry, projects), 0);
     }, [entries, projects]);
 
-    const weeklyEarnings = useMemo(() => getWeeklyEarnings(entries, projects), [entries, projects]);
+    const weeklyEarnings = useMemo(() => getWeeklyEarnings(entries, projects, preferences.firstDayOfWeek), [entries, projects, preferences.firstDayOfWeek]);
     const maxWeeklyEarning = useMemo(() => Math.max(...weeklyEarnings, 1), [weeklyEarnings]);
+
+    // Generate weekday labels based on user preference
+    const weekdayLabels = useMemo(() => {
+        const ALL_WEEKDAYS = [
+            t('calendar.weekdays.s'),   // Sunday
+            t('calendar.weekdays.m'),   // Monday
+            t('calendar.weekdays.t'),   // Tuesday
+            t('calendar.weekdays.w'),   // Wednesday
+            t('calendar.weekdays.th'),  // Thursday
+            t('calendar.weekdays.f'),   // Friday
+            t('calendar.weekdays.sa')   // Saturday
+        ];
+
+        const firstDayMap: { [key: string]: number } = {
+            'sunday': 0,
+            'monday': 1,
+            'tuesday': 2,
+            'wednesday': 3,
+            'thursday': 4,
+            'friday': 5,
+            'saturday': 6
+        };
+
+        const startIndex = firstDayMap[preferences.firstDayOfWeek] || 1;
+
+        return [
+            ...ALL_WEEKDAYS.slice(startIndex),
+            ...ALL_WEEKDAYS.slice(0, startIndex)
+        ];
+    }, [preferences.firstDayOfWeek, t]);
 
     const { productivityPercentage, productivityTrend } = useMemo(() => {
         const totalBillableTime = entries
@@ -138,13 +170,9 @@ export const SummaryReport: React.FC<SummaryReportProps> = ({ entries, projects,
                             ))}
                         </div>
                         <div className="mt-2 grid grid-cols-7 text-center text-xs font-medium text-gray-400">
-                            <span>{t('calendar.weekdays.m')}</span>
-                            <span>{t('calendar.weekdays.t')}</span>
-                            <span>{t('calendar.weekdays.w')}</span>
-                            <span>{t('calendar.weekdays.th')}</span>
-                            <span>{t('calendar.weekdays.f')}</span>
-                            <span>{t('calendar.weekdays.sa')}</span>
-                            <span>{t('calendar.weekdays.s')}</span>
+                            {weekdayLabels.map((label, index) => (
+                                <span key={index}>{label}</span>
+                            ))}
                         </div>
                     </div>
                 </div>

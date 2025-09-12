@@ -1,24 +1,45 @@
 import React from 'react';
 import { formatDuration } from '../utils/time';
 import { useLanguage } from '../contexts/LanguageContext';
+import { FirstDayOfWeek } from '../contexts/UserPreferencesContext';
 
 interface WeeklyChartProps {
   data: number[]; // Array of 7 numbers (milliseconds for each day)
+  firstDayOfWeek?: FirstDayOfWeek;
 }
 
-export const WeeklyChart: React.FC<WeeklyChartProps> = ({ data }) => {
+export const WeeklyChart: React.FC<WeeklyChartProps> = ({ data, firstDayOfWeek = 'monday' }) => {
   const { t } = useLanguage();
   const maxDuration = Math.max(...data, 1); // Avoid division by zero
-  
-  // These keys should correspond to a structure in your translation files
+
+  // Define all weekdays in order starting from Sunday (JavaScript's getDay() convention)
+  const ALL_WEEKDAYS = [
+    t('calendar.weekdays.s'),   // Sunday
+    t('calendar.weekdays.m'),   // Monday
+    t('calendar.weekdays.t'),   // Tuesday
+    t('calendar.weekdays.w'),   // Wednesday
+    t('calendar.weekdays.th'),  // Thursday
+    t('calendar.weekdays.f'),   // Friday
+    t('calendar.weekdays.sa')   // Saturday
+  ];
+
+  // Map first day of week to starting index
+  const firstDayMap: { [key: string]: number } = {
+    'sunday': 0,
+    'monday': 1,
+    'tuesday': 2,
+    'wednesday': 3,
+    'thursday': 4,
+    'friday': 5,
+    'saturday': 6
+  };
+
+  const startIndex = firstDayMap[firstDayOfWeek] || 1;
+
+  // Reorder weekdays based on user preference
   const WEEK_DAYS = [
-    t('calendar.weekdays.m'),
-    t('calendar.weekdays.t'),
-    t('calendar.weekdays.w'),
-    t('calendar.weekdays.th'),
-    t('calendar.weekdays.f'),
-    t('calendar.weekdays.sa'),
-    t('calendar.weekdays.s')
+    ...ALL_WEEKDAYS.slice(startIndex),
+    ...ALL_WEEKDAYS.slice(0, startIndex)
   ];
 
 

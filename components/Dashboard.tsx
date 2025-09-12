@@ -6,6 +6,7 @@ import { TimeEntryList } from './TimeEntryList';
 import { TimerInput } from './TimerInput';
 import { getTodayDateString, getTodayEntries, getWeeklySummary, formatDuration, formatCurrency, calculateEntryEarnings } from '../utils/time';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useUserPreferences } from '../contexts/UserPreferencesContext';
 
 interface DashboardProps {
   entries: TimeEntry[];
@@ -29,6 +30,7 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = (props) => {
   const { t, language } = useLanguage();
+  const { preferences } = useUserPreferences();
   const todayEntries = getTodayEntries(props.entries);
   
   const totalTimeToday = todayEntries.reduce((sum, entry) => sum + (entry.endTime - entry.startTime), 0);
@@ -85,7 +87,7 @@ export const Dashboard: React.FC<DashboardProps> = (props) => {
 
       <section>
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">{t('dashboard.thisWeek')}</h2>
-        <WeeklyChart data={getWeeklySummary(props.entries)} />
+        <WeeklyChart data={getWeeklySummary(props.entries, preferences.firstDayOfWeek)} firstDayOfWeek={preferences.firstDayOfWeek} />
       </section>
     </div>
   );

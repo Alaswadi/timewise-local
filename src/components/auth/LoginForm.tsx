@@ -148,12 +148,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
             {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Signing In...
+                {t('auth.login.signingIn')}
               </>
             ) : (
               <>
                 <span className="material-symbols-outlined mr-2">login</span>
-                Sign In
+                {t('auth.login.signIn')}
               </>
             )}
           </button>
@@ -162,13 +162,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
         {/* Switch to Register */}
         <div className="mt-8 text-center">
           <p className="text-gray-400">
-            Don't have an account?{' '}
+            {t('auth.login.noAccount')}{' '}
             <button
               onClick={onSwitchToRegister}
               className="text-[#38e07b] hover:text-[#2dd46f] font-medium transition-colors"
               disabled={isLoading}
             >
-              Sign up here
+              {t('auth.login.signUpHere')}
             </button>
           </p>
         </div>

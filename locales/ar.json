@@ -59,6 +59,15 @@
         "noEntries": "لا توجد إدخالات لهذا اليوم.",
         "weekdays": {
             "s": "ح", "m": "ن", "t": "ث", "w": "ر", "th": "خ", "f": "ج", "sa": "س"
+        },
+        "weekdaysFull": {
+            "sunday": "الأحد",
+            "monday": "الاثنين",
+            "tuesday": "الثلاثاء",
+            "wednesday": "الأربعاء",
+            "thursday": "الخميس",
+            "friday": "الجمعة",
+            "saturday": "السبت"
         }
     },
     "projectsPage": {
@@ -208,9 +217,7 @@
         "description": "إدارة مساحة العمل وتفضيلات الحساب.",
         "tabs": {
             "preferences": "التفضيلات",
-            "account": "الحساب",
-            "integrations": "التكاملات",
-            "api": "API"
+            "account": "الحساب"
         },
         "language": {
             "title": "اللغة",
@@ -224,10 +231,36 @@
             "title": "تتبع الوقت"
         },
         "reports": {
-            "title": "التقارير"
+            "title": "التقارير",
+            "firstDayOfWeek": "أول يوم في الأسبوع"
         },
         "notifications": {
             "title": "الإشعارات"
+        },
+        "account": {
+            "title": "إعدادات الحساب",
+            "profile": {
+                "title": "معلومات الملف الشخصي",
+                "email": "عنوان البريد الإلكتروني",
+                "username": "اسم المستخدم",
+                "memberSince": "عضو منذ",
+                "save": "حفظ التغييرات",
+                "cancel": "إلغاء",
+                "saving": "جاري الحفظ..."
+            },
+            "password": {
+                "title": "تغيير كلمة المرور",
+                "currentPassword": "كلمة المرور الحالية",
+                "currentPasswordPlaceholder": "أدخل كلمة المرور الحالية",
+                "newPassword": "كلمة المرور الجديدة",
+                "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+                "confirmPassword": "تأكيد كلمة المرور الجديدة",
+                "confirmPasswordPlaceholder": "أكد كلمة المرور الجديدة",
+                "changePassword": "تغيير كلمة المرور",
+                "changingPassword": "جاري تغيير كلمة المرور...",
+                "showPassword": "إظهار كلمة المرور",
+                "hidePassword": "إخفاء كلمة المرور"
+            }
         }
     },
     "auth": {
@@ -248,6 +281,39 @@
                 "fixErrors": "يرجى إصلاح الأخطاء التالية:",
                 "emailOrUsernameRequired": "البريد الإلكتروني أو اسم المستخدم مطلوب",
                 "passwordRequired": "كلمة المرور مطلوبة"
+            }
+        },
+        "register": {
+            "title": "إنشاء حساب",
+            "subtitle": "انضم إلى تايم وايز لبدء تتبع وقتك",
+            "email": "عنوان البريد الإلكتروني",
+            "emailPlaceholder": "أدخل عنوان بريدك الإلكتروني",
+            "username": "اسم المستخدم",
+            "usernamePlaceholder": "اختر اسم مستخدم",
+            "usernameHint": "3-20 حرف، أحرف وأرقام وشرطات سفلية فقط",
+            "password": "كلمة المرور",
+            "passwordPlaceholder": "أنشئ كلمة مرور قوية",
+            "confirmPassword": "تأكيد كلمة المرور",
+            "confirmPasswordPlaceholder": "أكد كلمة المرور",
+            "createAccount": "إنشاء حساب",
+            "creatingAccount": "جاري إنشاء الحساب...",
+            "showPassword": "إظهار كلمة المرور",
+            "hidePassword": "إخفاء كلمة المرور",
+            "haveAccount": "لديك حساب بالفعل؟",
+            "signInHere": "سجل دخولك هنا",
+            "errors": {
+                "fixErrors": "يرجى إصلاح الأخطاء التالية:",
+                "emailRequired": "البريد الإلكتروني مطلوب",
+                "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+                "usernameRequired": "اسم المستخدم مطلوب",
+                "usernameInvalid": "يجب أن يكون اسم المستخدم من 3-20 حرف ويحتوي على أحرف وأرقام وشرطات سفلية فقط",
+                "passwordRequired": "كلمة المرور مطلوبة",
+                "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+                "passwordUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+                "passwordLowercase": "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل",
+                "passwordNumber": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل",
+                "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
+                "passwordMismatch": "كلمات المرور غير متطابقة"
             }
         },
         "languageSelector": {

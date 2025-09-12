@@ -424,10 +424,75 @@ export const validateSession = async (token: string): Promise<AuthApiResponse> =
 };
 
 /**
+ * Mock API endpoint for changing user password
+ */
+export const changeUserPassword = async (
+  token: string,
+  data: { currentPassword: string; newPassword: string }
+): Promise<ApiResponse> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  try {
+    const validation = await validateSession(token);
+    if (!validation.success || !validation.data?.user) {
+      return {
+        success: false,
+        message: 'Invalid or expired session',
+      };
+    }
+
+    const users = getUsers();
+    const userIndex = users.findIndex(u => u.id === validation.data!.user!.id);
+
+    if (userIndex === -1) {
+      return {
+        success: false,
+        message: 'User not found',
+      };
+    }
+
+    const user = users[userIndex];
+
+    // Verify current password
+    if (simpleHash(data.currentPassword) !== user.password_hash) {
+      return {
+        success: false,
+        message: 'Current password is incorrect',
+      };
+    }
+
+    // Validate new password
+    if (!data.newPassword || data.newPassword.length < 6) {
+      return {
+        success: false,
+        message: 'New password must be at least 6 characters long',
+      };
+    }
+
+    // Update password
+    users[userIndex].password_hash = simpleHash(data.newPassword);
+    users[userIndex].updated_at = new Date().toISOString();
+
+    saveUsers(users);
+
+    return {
+      success: true,
+      message: 'Password changed successfully',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Password change failed',
+    };
+  }
+};
+
+/**
  * Mock API endpoint for updating user profile
  */
 export const updateUserProfile = async (
-  token: string, 
+  token: string,
   updates: { email?: string; username?: string }
 ): Promise<AuthApiResponse> => {
   // Simulate API delay
@@ -529,4 +594,5 @@ export default {
   logoutAllDevices,
   validateSession,
   updateUserProfile,
+  changeUserPassword,
 };

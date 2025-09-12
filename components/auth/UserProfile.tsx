@@ -6,55 +6,9 @@ interface UserProfileProps {
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
-  const { user, logout, logoutAll, updateProfile, isLoading, error, clearError } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    email: user?.email || '',
-    username: user?.username || '',
-  });
+  const { user, logout, logoutAll } = useAuth();
 
   if (!user) return null;
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-    
-    if (error) clearError();
-  };
-
-  const handleSave = async () => {
-    const updates: { email?: string; username?: string } = {};
-    
-    if (formData.email !== user.email) {
-      updates.email = formData.email;
-    }
-    
-    if (formData.username !== user.username) {
-      updates.username = formData.username;
-    }
-
-    if (Object.keys(updates).length === 0) {
-      setIsEditing(false);
-      return;
-    }
-
-    const success = await updateProfile(updates);
-    if (success) {
-      setIsEditing(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setFormData({
-      email: user.email,
-      username: user.username,
-    });
-    setIsEditing(false);
-    clearError();
-  };
 
   const handleLogout = async () => {
     await logout();
@@ -92,101 +46,17 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onClose }) => {
           </div>
         </div>
 
-        {/* Email Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Email Address
-          </label>
-          {isEditing ? (
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 bg-[#374151] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#38e07b] focus:border-transparent"
-              disabled={isLoading}
-            />
-          ) : (
-            <p className="text-white bg-[#374151] px-3 py-2 rounded-lg">{user.email}</p>
-          )}
-        </div>
-
-        {/* Username Field */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Username
-          </label>
-          {isEditing ? (
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 bg-[#374151] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#38e07b] focus:border-transparent"
-              disabled={isLoading}
-            />
-          ) : (
-            <p className="text-white bg-[#374151] px-3 py-2 rounded-lg">{user.username}</p>
-          )}
-        </div>
-
-        {/* Member Since */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Member Since
-          </label>
-          <p className="text-white bg-[#374151] px-3 py-2 rounded-lg">
-            {new Date(user.created_at).toLocaleDateString()}
+        {/* User Info */}
+        <div className="text-center space-y-2">
+          <h4 className="text-lg font-semibold text-white">{user.username}</h4>
+          <p className="text-gray-400 text-sm">{user.email}</p>
+          <p className="text-gray-500 text-xs">
+            Member since {new Date(user.created_at).toLocaleDateString()}
           </p>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3">
-            <div className="flex items-center">
-              <span className="material-symbols-outlined text-red-400 mr-2">error</span>
-              <span className="text-red-400 text-sm">{error}</span>
-            </div>
-          </div>
-        )}
-
         {/* Action Buttons */}
         <div className="space-y-3 pt-4">
-          {isEditing ? (
-            <div className="flex space-x-3">
-              <button
-                onClick={handleSave}
-                disabled={isLoading}
-                className="flex-1 bg-[#38e07b] hover:bg-[#2dd46f] disabled:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
-              >
-                {isLoading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined mr-1 text-sm">save</span>
-                    Save
-                  </>
-                )}
-              </button>
-              <button
-                onClick={handleCancel}
-                disabled={isLoading}
-                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
-              >
-                <span className="material-symbols-outlined mr-1 text-sm">cancel</span>
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
-            >
-              <span className="material-symbols-outlined mr-2">edit</span>
-              Edit Profile
-            </button>
-          )}
-
           <button
             onClick={handleLogoutAll}
             className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center"

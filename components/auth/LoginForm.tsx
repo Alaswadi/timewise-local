@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import LanguageSelector from '../common/LanguageSelector';
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -33,15 +34,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
 
   const validateForm = (): boolean => {
     const errors: string[] = [];
-    
+
     if (!formData.emailOrUsername.trim()) {
-      errors.push('Email or username is required');
+      errors.push(t('auth.login.errors.emailOrUsernameRequired'));
     }
-    
+
     if (!formData.password) {
-      errors.push('Password is required');
+      errors.push(t('auth.login.errors.passwordRequired'));
     }
-    
+
     setValidationErrors(errors);
     return errors.length === 0;
   };
@@ -63,16 +64,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="bg-[#1f2937] rounded-lg shadow-xl p-8">
+        {/* Language Selector */}
+        <div className="flex justify-end mb-6">
+          <LanguageSelector variant="compact" />
+        </div>
+
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-          <p className="text-gray-400">Sign in to your TimeWise account</p>
+          <h2 className="text-3xl font-bold text-white mb-2">{t('auth.login.title')}</h2>
+          <p className="text-gray-400">{t('auth.login.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email/Username Input */}
           <div>
             <label htmlFor="emailOrUsername" className="block text-sm font-medium text-gray-300 mb-2">
-              Email or Username
+              {t('auth.login.emailOrUsername')}
             </label>
             <input
               type="text"
@@ -81,7 +87,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
               value={formData.emailOrUsername}
               onChange={handleInputChange}
               className="w-full px-4 py-3 bg-[#374151] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#38e07b] focus:border-transparent transition-colors"
-              placeholder="Enter your email or username"
+              placeholder={t('auth.login.emailOrUsernamePlaceholder')}
               disabled={isLoading}
               autoComplete="username"
             />
@@ -90,7 +96,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
           {/* Password Input */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-              Password
+              {t('auth.login.password')}
             </label>
             <div className="relative">
               <input
@@ -100,7 +106,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
                 value={formData.password}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 bg-[#374151] border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#38e07b] focus:border-transparent transition-colors pr-12"
-                placeholder="Enter your password"
+                placeholder={t('auth.login.passwordPlaceholder')}
                 disabled={isLoading}
                 autoComplete="current-password"
               />
@@ -109,6 +115,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                 disabled={isLoading}
+                title={showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')}
               >
                 <span className="material-symbols-outlined text-xl">
                   {showPassword ? 'visibility_off' : 'visibility'}
@@ -122,7 +129,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
             <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4">
               <div className="flex items-center mb-2">
                 <span className="material-symbols-outlined text-red-400 mr-2">error</span>
-                <span className="text-red-400 font-medium">Please fix the following errors:</span>
+                <span className="text-red-400 font-medium">{t('auth.login.errors.fixErrors')}</span>
               </div>
               <ul className="list-disc list-inside text-red-300 text-sm space-y-1">
                 {allErrors.map((error, index) => (
@@ -141,12 +148,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
             {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Signing In...
+                {t('auth.login.signingIn')}
               </>
             ) : (
               <>
                 <span className="material-symbols-outlined mr-2">login</span>
-                Sign In
+                {t('auth.login.signIn')}
               </>
             )}
           </button>
@@ -155,13 +162,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSucc
         {/* Switch to Register */}
         <div className="mt-8 text-center">
           <p className="text-gray-400">
-            Don't have an account?{' '}
+            {t('auth.login.noAccount')}{' '}
             <button
               onClick={onSwitchToRegister}
               className="text-[#38e07b] hover:text-[#2dd46f] font-medium transition-colors"
               disabled={isLoading}
             >
-              Sign up here
+              {t('auth.login.signUpHere')}
             </button>
           </p>
         </div>

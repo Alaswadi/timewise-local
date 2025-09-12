@@ -59,6 +59,15 @@
         "noEntries": "No entries for this day.",
         "weekdays": {
             "s": "S", "m": "M", "t": "T", "w": "W", "th": "T", "f": "F", "sa": "S"
+        },
+        "weekdaysFull": {
+            "sunday": "Sunday",
+            "monday": "Monday",
+            "tuesday": "Tuesday",
+            "wednesday": "Wednesday",
+            "thursday": "Thursday",
+            "friday": "Friday",
+            "saturday": "Saturday"
         }
     },
     "projectsPage": {
@@ -208,9 +217,7 @@
         "description": "Manage your workspace and account preferences.",
         "tabs": {
             "preferences": "Preferences",
-            "account": "Account",
-            "integrations": "Integrations",
-            "api": "API"
+            "account": "Account"
         },
         "language": {
             "title": "Language",
@@ -224,10 +231,36 @@
             "title": "Time tracking"
         },
         "reports": {
-            "title": "Reports"
+            "title": "Reports",
+            "firstDayOfWeek": "First day of the week"
         },
         "notifications": {
             "title": "Notifications"
+        },
+        "account": {
+            "title": "Account Settings",
+            "profile": {
+                "title": "Profile Information",
+                "email": "Email Address",
+                "username": "Username",
+                "memberSince": "Member since",
+                "save": "Save Changes",
+                "cancel": "Cancel",
+                "saving": "Saving..."
+            },
+            "password": {
+                "title": "Change Password",
+                "currentPassword": "Current Password",
+                "currentPasswordPlaceholder": "Enter your current password",
+                "newPassword": "New Password",
+                "newPasswordPlaceholder": "Enter your new password",
+                "confirmPassword": "Confirm New Password",
+                "confirmPasswordPlaceholder": "Confirm your new password",
+                "changePassword": "Change Password",
+                "changingPassword": "Changing Password...",
+                "showPassword": "Show password",
+                "hidePassword": "Hide password"
+            }
         }
     },
     "auth": {
@@ -248,6 +281,39 @@
                 "fixErrors": "Please fix the following errors:",
                 "emailOrUsernameRequired": "Email or username is required",
                 "passwordRequired": "Password is required"
+            }
+        },
+        "register": {
+            "title": "Create Account",
+            "subtitle": "Join TimeWise to start tracking your time",
+            "email": "Email Address",
+            "emailPlaceholder": "Enter your email address",
+            "username": "Username",
+            "usernamePlaceholder": "Choose a username",
+            "usernameHint": "3-20 characters, letters, numbers, and underscores only",
+            "password": "Password",
+            "passwordPlaceholder": "Create a strong password",
+            "confirmPassword": "Confirm Password",
+            "confirmPasswordPlaceholder": "Confirm your password",
+            "createAccount": "Create Account",
+            "creatingAccount": "Creating Account...",
+            "showPassword": "Show password",
+            "hidePassword": "Hide password",
+            "haveAccount": "Already have an account?",
+            "signInHere": "Sign in here",
+            "errors": {
+                "fixErrors": "Please fix the following errors:",
+                "emailRequired": "Email is required",
+                "emailInvalid": "Please enter a valid email address",
+                "usernameRequired": "Username is required",
+                "usernameInvalid": "Username must be 3-20 characters long and contain only letters, numbers, and underscores",
+                "passwordRequired": "Password is required",
+                "passwordMinLength": "Password must be at least 8 characters long",
+                "passwordUppercase": "Password must contain at least one uppercase letter",
+                "passwordLowercase": "Password must contain at least one lowercase letter",
+                "passwordNumber": "Password must contain at least one number",
+                "confirmPasswordRequired": "Password confirmation is required",
+                "passwordMismatch": "Passwords do not match"
             }
         },
         "languageSelector": {

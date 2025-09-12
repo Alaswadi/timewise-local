@@ -31,7 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
         <aside className="w-64 bg-gray-800/50 p-6 flex-col hidden md:flex">
             <div className="flex items-center space-x-3 mb-10">
                 <Logo />
-                <span className="text-xl font-bold text-white">TimeTrackr</span>
+                <span className="text-xl font-bold text-white">TimeWise</span>
             </div>
 
             <nav className="flex-1 space-y-2">

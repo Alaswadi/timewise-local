@@ -13,36 +13,18 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAuth } from './contexts/AuthContext';
 import AuthModal from './components/auth/AuthModal';
+import { TimeWiseLogo } from './components/icons/TimeWiseLogo';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 export type View = 'Dashboard' | 'List' | 'Calendar' | 'Projects' | 'Tasks' | 'Reports' | 'Settings' | 'Clients';
 
 // Helper function to create initial data for a user
+// Returns empty arrays to ensure new accounts start clean with no sample data
 const createInitialDataForUser = (userId: string) => {
-  const clients: Client[] = [
-    { id: 'client-1', name: 'Internal', userId },
-    { id: 'client-2', name: 'RetailCorp', userId },
-    { id: 'client-3', name: 'Data Inc.', userId },
-  ];
-
-  const projects: Project[] = [
-    { id: 'proj-1', name: 'Time Tracker App', clientId: 'client-1', userId, isBillable: true, hourlyRate: 50 },
-    { id: 'proj-2', name: 'E-commerce Platform', clientId: 'client-2', userId, isBillable: true, hourlyRate: 75 },
-    { id: 'proj-3', name: 'Data Analytics Dashboard', clientId: 'client-3', userId, isBillable: false, hourlyRate: 0 },
-  ];
-
-  const tasks: Task[] = [
-    { id: 'task-1', name: 'Develop UI components', projectId: 'proj-1', userId },
-    { id: 'task-2', name: 'Setup database schema', projectId: 'proj-1', userId },
-    { id: 'task-3', name: 'Implement checkout flow', projectId: 'proj-2', userId },
-    { id: 'task-4', name: 'Visualize sales data', projectId: 'proj-3', userId },
-  ];
-
-  const entries: TimeEntry[] = [
-    { id: uuidv4(), description: "Refactor auth module", startTime: Date.now() - 3 * 3600 * 1000, endTime: Date.now() - 2 * 3600 * 1000, projectId: "proj-1", billable: true, userId },
-    { id: uuidv4(), description: "Design landing page mockups", startTime: Date.now() - 5 * 3600 * 1000, endTime: Date.now() - 4 * 3600 * 1000, projectId: "proj-2", billable: true, userId },
-    { id: uuidv4(), description: "API integration for payments", startTime: Date.now() - 8 * 3600 * 1000, endTime: Date.now() - 6 * 3600 * 1000, projectId: "proj-2", billable: true, userId },
-  ];
+  const clients: Client[] = [];
+  const projects: Project[] = [];
+  const tasks: Task[] = [];
+  const entries: TimeEntry[] = [];
 
   return { clients, projects, tasks, entries };
 };
@@ -346,6 +328,9 @@ const App: React.FC = () => {
       <div className="relative flex size-full min-h-screen flex-col text-white group/design-root overflow-x-hidden">
         <div className="flex items-center justify-center min-h-screen bg-[#111827]">
           <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <TimeWiseLogo className="h-20 w-20" size={80} />
+            </div>
             <h1 className="text-4xl font-bold text-white mb-4">TimeWise</h1>
             <p className="text-gray-400 mb-8">Modern Time Tracking & Reports</p>
             <button

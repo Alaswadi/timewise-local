@@ -22,6 +22,7 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   updateProfile: (updates: { email?: string; username?: string }) => Promise<boolean>;
+  changePassword: (data: { currentPassword: string; newPassword: string }) => Promise<boolean>;
   clearError: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -250,6 +251,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [getStoredToken, storeUser]);
 
+  // Change password function
+  const changePassword = useCallback(async (data: { currentPassword: string; newPassword: string }): Promise<boolean> => {
+    const token = getStoredToken();
+    if (!token) {
+      setError('Not authenticated');
+      return false;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await authApi.changeUserPassword(token, data);
+
+      if (response.success) {
+        return true;
+      } else {
+        setError(response.message || 'Password change failed');
+        return false;
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Password change failed';
+      setError(errorMessage);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getStoredToken]);
+
   // Initialize auth state on mount
   useEffect(() => {
     const initializeAuth = async () => {
@@ -287,6 +317,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     logoutAll,
     updateProfile,
+    changePassword,
     clearError,
     refreshUser,
   };

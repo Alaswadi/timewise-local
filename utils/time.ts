@@ -93,42 +93,58 @@ export const getTodayEntries = (entries: TimeEntry[]): TimeEntry[] => {
     return entries.filter(entry => isSameDay(new Date(entry.startTime), today));
 }
 
-export const getWeeklySummary = (entries: TimeEntry[]): number[] => {
+// Helper function to get day offset based on first day of week preference
+const getDayOffset = (firstDayOfWeek: string): number => {
+    const dayMap: { [key: string]: number } = {
+        'sunday': 0,
+        'monday': 1,
+        'tuesday': 2,
+        'wednesday': 3,
+        'thursday': 4,
+        'friday': 5,
+        'saturday': 6
+    };
+    return dayMap[firstDayOfWeek] || 1; // Default to Monday if invalid
+};
+
+export const getWeeklySummary = (entries: TimeEntry[], firstDayOfWeek: string = 'monday'): number[] => {
     const weekData = Array(7).fill(0);
     const today = new Date();
     const dayOfWeek = today.getDay(); // Sunday - 0, Monday - 1, etc.
-    
-    // Normalize to start week on Monday
-    const adjustedDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const firstDayOffset = getDayOffset(firstDayOfWeek);
+
+    // Calculate how many days back to go to reach the first day of the week
+    let adjustedDayOfWeek = (dayOfWeek - firstDayOffset + 7) % 7;
 
     for (let i = 0; i < 7; i++) {
         const date = new Date(today);
         date.setDate(today.getDate() - (adjustedDayOfWeek - i));
-        
+
         const dayEntries = entries.filter(entry => isSameDay(new Date(entry.startTime), date));
         const totalDuration = dayEntries.reduce((sum, entry) => sum + (entry.endTime - entry.startTime), 0);
         weekData[i] = totalDuration;
     }
-    
+
     return weekData;
 }
 
-export const getWeeklyEarnings = (entries: TimeEntry[], projects: Project[]): number[] => {
+export const getWeeklyEarnings = (entries: TimeEntry[], projects: Project[], firstDayOfWeek: string = 'monday'): number[] => {
     const weekData = Array(7).fill(0);
     const today = new Date();
     const dayOfWeek = today.getDay(); // Sunday - 0, Monday - 1, etc.
-    
-    // Normalize to start week on Monday
-    const adjustedDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const firstDayOffset = getDayOffset(firstDayOfWeek);
+
+    // Calculate how many days back to go to reach the first day of the week
+    let adjustedDayOfWeek = (dayOfWeek - firstDayOffset + 7) % 7;
 
     for (let i = 0; i < 7; i++) {
         const date = new Date(today);
         date.setDate(today.getDate() - (adjustedDayOfWeek - i));
-        
+
         const dayEntries = entries.filter(entry => isSameDay(new Date(entry.startTime), date));
         const totalEarnings = dayEntries.reduce((sum, entry) => sum + calculateEntryEarnings(entry, projects), 0);
         weekData[i] = totalEarnings;
     }
-    
+
     return weekData;
 }

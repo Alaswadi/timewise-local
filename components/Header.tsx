@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView }) => {
     <>
       <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-700 px-4 sm:px-10 py-4">
         <div className="flex items-center gap-4 text-white">
-          <TimeWiseLogo />
+          <TimeWiseLogo className="h-10 w-10" size={40} />
           <h1 className="text-white text-xl font-bold">{t('header.title')}</h1>
         </div>
         <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-400">
@@ -88,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, setView }) => {
 
               {/* User Profile Dropdown */}
               {showUserProfile && (
-                <div className="absolute right-0 top-full mt-2 z-50">
+                <div className="absolute right-0 rtl:left-0 rtl:right-auto top-full mt-2 z-50">
                   <UserProfile onClose={() => setShowUserProfile(false)} />
                 </div>
               )}
