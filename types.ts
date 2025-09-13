@@ -10,6 +10,7 @@ export interface TimeEntry {
   taskId?: string;
   billable: boolean;
   userId: string; // Now required for authentication
+  isManual?: boolean; // Flag to indicate manually added entries
   // FIX: Added optional properties for legacy multi-tenant components.
   workspaceId?: string;
 }

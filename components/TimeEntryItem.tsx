@@ -4,6 +4,7 @@ import { formatDuration, formatCurrency, calculateEntryEarnings } from '../utils
 import { PlayIcon } from './icons/PlayIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { DollarIcon } from './icons/DollarIcon';
+import { ManualIcon } from './icons/ManualIcon';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface TimeEntryItemProps {
@@ -23,7 +24,14 @@ export const TimeEntryItem: React.FC<TimeEntryItemProps> = ({ entry, onDelete, o
   return (
     <div className="bg-gray-800/50 hover:bg-gray-800 transition-colors duration-200 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex-1 overflow-hidden w-full">
-        <p className="text-white font-medium truncate">{entry.description}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-white font-medium truncate">{entry.description}</p>
+          {entry.isManual && (
+            <span className="text-blue-400" title="Manual Entry">
+              <ManualIcon />
+            </span>
+          )}
+        </div>
         <p className="text-sm text-gray-400 truncate">
           {projectName} {taskName && <>&bull; {taskName}</>}
         </p>

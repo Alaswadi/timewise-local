@@ -15,8 +15,20 @@ import { useAuth } from './contexts/AuthContext';
 import AuthModal from './components/auth/AuthModal';
 import { TimeWiseLogo } from './components/icons/TimeWiseLogo';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { createTimestampsFromDateAndTime, createTimestampsFromDateAndDuration } from './utils/time';
 
 export type View = 'Dashboard' | 'List' | 'Calendar' | 'Projects' | 'Tasks' | 'Reports' | 'Settings' | 'Clients';
+
+interface ManualTimeEntryData {
+  description: string;
+  projectId: string;
+  taskId?: string;
+  date: string;
+  duration?: number;
+  startTime?: string;
+  endTime?: string;
+  billable: boolean;
+}
 
 // Helper function to create initial data for a user
 // Returns empty arrays to ensure new accounts start clean with no sample data
@@ -263,6 +275,46 @@ const App: React.FC = () => {
     setEntries(prev => prev.filter(entry => entry.id !== id));
   }, []);
 
+  const handleManualEntryAdd = useCallback((data: ManualTimeEntryData) => {
+    if (!user) return;
+
+    try {
+      let timestamps: { startTimestamp: number; endTimestamp: number } | null = null;
+
+      if (data.startTime && data.endTime) {
+        // Use time range
+        timestamps = createTimestampsFromDateAndTime(data.date, data.startTime, data.endTime);
+      } else if (data.duration) {
+        // Use duration
+        timestamps = createTimestampsFromDateAndDuration(data.date, data.duration);
+      }
+
+      if (!timestamps) {
+        console.error('Failed to create timestamps for manual entry');
+        return;
+      }
+
+      const newEntry: TimeEntry = {
+        id: uuidv4(),
+        description: data.description,
+        startTime: timestamps.startTimestamp,
+        endTime: timestamps.endTimestamp,
+        projectId: data.projectId,
+        taskId: data.taskId,
+        billable: data.billable,
+        userId: user.id,
+        isManual: true,
+      };
+
+      setEntries(prev => [newEntry, ...prev]);
+
+      // Show success message (optional)
+      console.log('Manual time entry added successfully');
+    } catch (error) {
+      console.error('Error adding manual time entry:', error);
+    }
+  }, [user]);
+
   // Client CRUD Handlers
   const handleAddClient = (clientPayload: NewClientPayload) => {
     if (!user) return;
@@ -343,6 +395,7 @@ const App: React.FC = () => {
         onTaskChange: setSelectedTaskId,
         isTimerBillable,
         onBillableChange: setIsTimerBillable,
+        onManualEntryAdd: handleManualEntryAdd,
     };
 
     switch (view) {

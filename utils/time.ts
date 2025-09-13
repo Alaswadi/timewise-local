@@ -148,3 +148,182 @@ export const getWeeklyEarnings = (entries: TimeEntry[], projects: Project[], fir
 
     return weekData;
 }
+
+// Manual time entry utilities
+export const parseDurationInput = (input: string): number | null => {
+    if (!input || typeof input !== 'string') return null;
+
+    const trimmed = input.trim();
+
+    // Try to parse as HH:MM format
+    const timeMatch = trimmed.match(/^(\d{1,2}):(\d{2})$/);
+    if (timeMatch) {
+        const hours = parseInt(timeMatch[1], 10);
+        const minutes = parseInt(timeMatch[2], 10);
+
+        if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+            return null;
+        }
+
+        return (hours * 60 + minutes) * 60 * 1000; // Convert to milliseconds
+    }
+
+    // Try to parse as minutes only
+    const minutesMatch = trimmed.match(/^(\d+)$/);
+    if (minutesMatch) {
+        const minutes = parseInt(minutesMatch[1], 10);
+        if (minutes < 0 || minutes > 1440) { // Max 24 hours
+            return null;
+        }
+        return minutes * 60 * 1000; // Convert to milliseconds
+    }
+
+    return null;
+};
+
+export const formatDurationForInput = (milliseconds: number): string => {
+    if (milliseconds < 0) return '0:00';
+
+    const totalMinutes = Math.floor(milliseconds / (1000 * 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+};
+
+export const validateDateInput = (dateString: string): { isValid: boolean; error?: string } => {
+    if (!dateString) {
+        return { isValid: false, error: 'Date is required' };
+    }
+
+    const date = new Date(dateString);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
+
+    if (isNaN(date.getTime())) {
+        return { isValid: false, error: 'Invalid date format' };
+    }
+
+    if (date > today) {
+        return { isValid: false, error: 'Date cannot be in the future' };
+    }
+
+    return { isValid: true };
+};
+
+export const parseTimeInput = (timeString: string): number | null => {
+    if (!timeString) return null;
+
+    const timeMatch = timeString.match(/^(\d{1,2}):(\d{2})$/);
+    if (!timeMatch) return null;
+
+    const hours = parseInt(timeMatch[1], 10);
+    const minutes = parseInt(timeMatch[2], 10);
+
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+        return null;
+    }
+
+    return hours * 60 + minutes; // Return total minutes
+};
+
+export const calculateTimeRangeDuration = (
+    date: string,
+    startTime: string,
+    endTime: string
+): { duration: number | null; error?: string } => {
+    const startMinutes = parseTimeInput(startTime);
+    const endMinutes = parseTimeInput(endTime);
+
+    if (startMinutes === null) {
+        return { duration: null, error: 'Invalid start time format' };
+    }
+
+    if (endMinutes === null) {
+        return { duration: null, error: 'Invalid end time format' };
+    }
+
+    let durationMinutes = endMinutes - startMinutes;
+
+    // Handle overnight work (end time next day)
+    if (durationMinutes < 0) {
+        durationMinutes += 24 * 60; // Add 24 hours
+    }
+
+    // Validate reasonable duration (max 24 hours)
+    if (durationMinutes > 24 * 60) {
+        return { duration: null, error: 'Duration cannot exceed 24 hours' };
+    }
+
+    if (durationMinutes === 0) {
+        return { duration: null, error: 'End time must be after start time' };
+    }
+
+    return { duration: durationMinutes * 60 * 1000 }; // Convert to milliseconds
+};
+
+export const formatTimeForInput = (minutes: number): string => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+};
+
+export const createTimestampsFromDateAndTime = (
+    date: string,
+    startTime: string,
+    endTime: string
+): { startTimestamp: number; endTimestamp: number } | null => {
+    const baseDate = new Date(date);
+    if (isNaN(baseDate.getTime())) return null;
+
+    const startMinutes = parseTimeInput(startTime);
+    const endMinutes = parseTimeInput(endTime);
+
+    if (startMinutes === null || endMinutes === null) return null;
+
+    const startTimestamp = new Date(baseDate);
+    startTimestamp.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
+
+    const endTimestamp = new Date(baseDate);
+    endTimestamp.setHours(Math.floor(endMinutes / 60), endMinutes % 60, 0, 0);
+
+    // Handle overnight work
+    if (endMinutes < startMinutes) {
+        endTimestamp.setDate(endTimestamp.getDate() + 1);
+    }
+
+    return {
+        startTimestamp: startTimestamp.getTime(),
+        endTimestamp: endTimestamp.getTime()
+    };
+};
+
+export const createTimestampsFromDateAndDuration = (
+    date: string,
+    duration: number,
+    startTime?: string
+): { startTimestamp: number; endTimestamp: number } | null => {
+    const baseDate = new Date(date);
+    if (isNaN(baseDate.getTime())) return null;
+
+    let startTimestamp: Date;
+
+    if (startTime) {
+        const startMinutes = parseTimeInput(startTime);
+        if (startMinutes === null) return null;
+
+        startTimestamp = new Date(baseDate);
+        startTimestamp.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
+    } else {
+        // Default to 9:00 AM if no start time specified
+        startTimestamp = new Date(baseDate);
+        startTimestamp.setHours(9, 0, 0, 0);
+    }
+
+    const endTimestamp = new Date(startTimestamp.getTime() + duration);
+
+    return {
+        startTimestamp: startTimestamp.getTime(),
+        endTimestamp: endTimestamp.getTime()
+    };
+};

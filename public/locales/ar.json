@@ -322,6 +322,42 @@
             "arabic": "العربية"
         }
     },
+    "manualEntry": {
+        "title": "إدخال وقت يدوي",
+        "subtitle": "أضف عمل سابق لم يتم تتبعه",
+        "button": "إضافة إدخال يدوي",
+        "form": {
+            "description": "الوصف",
+            "descriptionPlaceholder": "على ماذا عملت؟",
+            "project": "المشروع",
+            "selectProject": "اختر مشروع",
+            "task": "المهمة",
+            "selectTask": "اختر مهمة (اختياري)",
+            "date": "التاريخ",
+            "duration": "المدة",
+            "durationPlaceholder": "مثال: 2:30 أو 150 دقيقة",
+            "startTime": "وقت البداية",
+            "endTime": "وقت النهاية",
+            "billable": "مدفوع",
+            "useTimeRange": "استخدم نطاق زمني بدلاً من ذلك",
+            "useDuration": "استخدم المدة بدلاً من ذلك"
+        },
+        "validation": {
+            "descriptionRequired": "الوصف مطلوب",
+            "projectRequired": "يرجى اختيار مشروع",
+            "dateRequired": "التاريخ مطلوب",
+            "dateInFuture": "لا يمكن أن يكون التاريخ في المستقبل",
+            "durationRequired": "المدة مطلوبة",
+            "durationInvalid": "تنسيق المدة غير صحيح. استخدم HH:MM أو الدقائق",
+            "durationTooLong": "لا يمكن أن تتجاوز المدة 24 ساعة",
+            "startTimeRequired": "وقت البداية مطلوب",
+            "endTimeRequired": "وقت النهاية مطلوب",
+            "endTimeBeforeStart": "يجب أن يكون وقت النهاية بعد وقت البداية",
+            "timeRangeTooLong": "لا يمكن أن يتجاوز النطاق الزمني 24 ساعة"
+        },
+        "success": "تم إضافة الإدخال اليدوي بنجاح",
+        "error": "فشل في إضافة الإدخال اليدوي"
+    },
     "common": {
         "cancel": "إلغاء",
         "save": "حفظ"

@@ -3,6 +3,7 @@ import { Project, Task, TimeEntry } from '../types';
 import { formatDate, formatDuration, formatTime, formatCurrency, calculateEntryEarnings } from '../utils/time';
 import { TrashIcon } from './icons/TrashIcon';
 import { DollarIcon } from './icons/DollarIcon';
+import { ManualIcon } from './icons/ManualIcon';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface TimeEntryTableProps {
@@ -36,7 +37,14 @@ export const TimeEntryTable: React.FC<TimeEntryTableProps> = ({ entries, onDelet
               <tr key={entry.id} className="block md:table-row mb-4 md:mb-0 hover:bg-gray-700/50 transition-colors duration-200">
                 <td data-label={t('list.description')} className="px-6 py-3 md:py-4 font-medium text-gray-100 whitespace-nowrap block md:table-cell text-start before:content-[attr(data-label)] before:block before:font-bold before:text-xs before:uppercase before:text-gray-400 md:before:hidden mb-2 md:mb-0">
                   <div className="flex flex-col">
-                      <span>{entry.description}</span>
+                      <div className="flex items-center gap-2">
+                        <span>{entry.description}</span>
+                        {entry.isManual && (
+                          <span className="text-blue-400" title="Manual Entry">
+                            <ManualIcon />
+                          </span>
+                        )}
+                      </div>
                       <span className="text-xs text-gray-400 md:hidden mt-1">{getProjectName(entry.projectId)} {getTaskName(entry.taskId) !== t('list.notApplicable') && `> ${getTaskName(entry.taskId)}`}</span>
                   </div>
                 </td>
