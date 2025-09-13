@@ -517,6 +517,34 @@ export const SettingsPage: React.FC = () => {
                                     </button>
                                 )}
                             </div>
+
+                            {/* Reset Data Section */}
+                            <div className="border-t border-gray-700 pt-6">
+                                <h3 className="text-lg font-medium text-white mb-4">Reset Data</h3>
+                                <p className="text-gray-400 text-sm mb-4">
+                                    This will clear all your data and create sample projects and tasks to help you get started.
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        if (window.confirm('Are you sure you want to reset all your data? This cannot be undone.')) {
+                                            // Clear localStorage for this user
+                                            const userId = user.id;
+                                            localStorage.removeItem(`timeEntries_${userId}`);
+                                            localStorage.removeItem(`clients_${userId}`);
+                                            localStorage.removeItem(`projects_${userId}`);
+                                            localStorage.removeItem(`tasks_${userId}`);
+                                            localStorage.removeItem(`timerState_${userId}`);
+
+                                            // Reload the page to trigger sample data creation
+                                            window.location.reload();
+                                        }
+                                    }}
+                                    className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
+                                >
+                                    <span className="material-symbols-outlined mr-2">refresh</span>
+                                    Reset All Data & Create Sample Data
+                                </button>
+                            </div>
                         </div>
                     </section>
                 )}

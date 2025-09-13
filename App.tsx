@@ -33,11 +33,66 @@ interface ManualTimeEntryData {
 }
 
 // Helper function to create initial data for a user
-// Returns empty arrays to ensure new accounts start clean with no sample data
+// Creates sample data to help new users get started
 const createInitialDataForUser = (userId: string) => {
-  const clients: Client[] = [];
-  const projects: Project[] = [];
-  const tasks: Task[] = [];
+  // Create sample client
+  const clients: Client[] = [
+    {
+      id: uuidv4(),
+      name: 'Sample Client',
+      email: 'client@example.com',
+      userId: userId
+    }
+  ];
+
+  // Create sample projects with hourly rates
+  const projects: Project[] = [
+    {
+      id: uuidv4(),
+      name: 'Web Development',
+      clientId: clients[0].id,
+      isBillable: true,
+      hourlyRate: 75,
+      userId: userId
+    },
+    {
+      id: uuidv4(),
+      name: 'Design Work',
+      clientId: clients[0].id,
+      isBillable: true,
+      hourlyRate: 60,
+      userId: userId
+    }
+  ];
+
+  // Create sample tasks
+  const tasks: Task[] = [
+    {
+      id: uuidv4(),
+      name: 'Frontend Development',
+      projectId: projects[0].id,
+      userId: userId
+    },
+    {
+      id: uuidv4(),
+      name: 'Backend Development',
+      projectId: projects[0].id,
+      userId: userId
+    },
+    {
+      id: uuidv4(),
+      name: 'UI Design',
+      projectId: projects[1].id,
+      userId: userId
+    },
+    {
+      id: uuidv4(),
+      name: 'UX Research',
+      projectId: projects[1].id,
+      userId: userId
+    }
+  ];
+
   const entries: TimeEntry[] = [];
 
   return { clients, projects, tasks, entries };
@@ -69,24 +124,44 @@ const App: React.FC = () => {
       const savedProjects = localStorage.getItem(projectsStorageKey);
       const savedTasks = localStorage.getItem(tasksStorageKey);
 
-      if (savedEntries || savedClients || savedProjects || savedTasks) {
+      try {
         // Load existing data
-        try {
-          setEntries(savedEntries ? JSON.parse(savedEntries) : []);
-          setClients(savedClients ? JSON.parse(savedClients) : []);
-          setProjects(savedProjects ? JSON.parse(savedProjects) : []);
-          setTasks(savedTasks ? JSON.parse(savedTasks) : []);
-        } catch (error) {
-          console.error('Error loading user data:', error);
-          // Create initial data if loading fails
+        const loadedEntries = savedEntries ? JSON.parse(savedEntries) : [];
+        const loadedClients = savedClients ? JSON.parse(savedClients) : [];
+        const loadedProjects = savedProjects ? JSON.parse(savedProjects) : [];
+        const loadedTasks = savedTasks ? JSON.parse(savedTasks) : [];
+
+        // Check if user has any meaningful data (not just empty arrays)
+        const hasData = loadedEntries.length > 0 || loadedClients.length > 0 ||
+                       loadedProjects.length > 0 || loadedTasks.length > 0;
+
+        console.log('📊 User data check:', {
+          entries: loadedEntries.length,
+          clients: loadedClients.length,
+          projects: loadedProjects.length,
+          tasks: loadedTasks.length,
+          hasData
+        });
+
+        if (hasData) {
+          // User has existing data, load it
+          console.log('📂 Loading existing user data');
+          setEntries(loadedEntries);
+          setClients(loadedClients);
+          setProjects(loadedProjects);
+          setTasks(loadedTasks);
+        } else {
+          // User has no data (new user or empty data), create sample data
+          console.log('🆕 Creating sample data for user');
           const initialData = createInitialDataForUser(user.id);
           setEntries(initialData.entries);
           setClients(initialData.clients);
           setProjects(initialData.projects);
           setTasks(initialData.tasks);
         }
-      } else {
-        // Create initial data for new user
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        // Create initial data if loading fails
         const initialData = createInitialDataForUser(user.id);
         setEntries(initialData.entries);
         setClients(initialData.clients);
