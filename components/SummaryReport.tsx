@@ -1,8 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { TimeEntry, Project, Client, ProjectReport } from '../types';
-import { formatCurrency, formatDuration, calculateEntryEarnings, getWeeklyEarnings } from '../utils/time';
+import {
+    formatCurrency,
+    formatDuration,
+    calculateEntryEarnings,
+    getWeeklyEarnings,
+    TimeFilterPeriod,
+    filterEntriesByPeriod,
+    getChartDataForPeriod,
+    getChartLabelsForPeriod,
+    calculateProductivityTrends,
+    getDailyProductivityData,
+    getProductivityChartLabels
+} from '../utils/time';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUserPreferences } from '../contexts/UserPreferencesContext';
+import { ProductivityChart } from './ProductivityChart';
 
 interface SummaryReportProps {
     entries: TimeEntry[];
@@ -13,83 +26,56 @@ interface SummaryReportProps {
 export const SummaryReport: React.FC<SummaryReportProps> = ({ entries, projects, clients }) => {
     const { t, language } = useLanguage();
     const { preferences } = useUserPreferences();
+    const [selectedPeriod, setSelectedPeriod] = useState<TimeFilterPeriod>('all');
 
-    const totalHours = useMemo(() => entries.reduce((acc, e) => acc + (e.endTime - e.startTime), 0), [entries]);
-    
+    // Filter entries based on selected time period
+    const filteredEntries = useMemo(() =>
+        filterEntriesByPeriod(entries, selectedPeriod),
+        [entries, selectedPeriod]
+    );
+
+    const totalHours = useMemo(() =>
+        filteredEntries.reduce((acc, e) => acc + (e.endTime - e.startTime), 0),
+        [filteredEntries]
+    );
+
     const totalEarnings = useMemo(() => {
-        return entries.reduce((acc, entry) => acc + calculateEntryEarnings(entry, projects), 0);
-    }, [entries, projects]);
+        return filteredEntries.reduce((acc, entry) => acc + calculateEntryEarnings(entry, projects), 0);
+    }, [filteredEntries, projects]);
 
-    const weeklyEarnings = useMemo(() => getWeeklyEarnings(entries, projects, preferences.firstDayOfWeek), [entries, projects, preferences.firstDayOfWeek]);
-    const maxWeeklyEarning = useMemo(() => Math.max(...weeklyEarnings, 1), [weeklyEarnings]);
+    // Get chart data based on selected period
+    const chartData = useMemo(() =>
+        getChartDataForPeriod(filteredEntries, projects, selectedPeriod, preferences.firstDayOfWeek),
+        [filteredEntries, projects, selectedPeriod, preferences.firstDayOfWeek]
+    );
 
-    // Generate weekday labels based on user preference
-    const weekdayLabels = useMemo(() => {
-        const ALL_WEEKDAYS = [
-            t('calendar.weekdays.s'),   // Sunday
-            t('calendar.weekdays.m'),   // Monday
-            t('calendar.weekdays.t'),   // Tuesday
-            t('calendar.weekdays.w'),   // Wednesday
-            t('calendar.weekdays.th'),  // Thursday
-            t('calendar.weekdays.f'),   // Friday
-            t('calendar.weekdays.sa')   // Saturday
-        ];
+    const chartLabels = useMemo(() =>
+        getChartLabelsForPeriod(selectedPeriod),
+        [selectedPeriod]
+    );
 
-        const firstDayMap: { [key: string]: number } = {
-            'sunday': 0,
-            'monday': 1,
-            'tuesday': 2,
-            'wednesday': 3,
-            'thursday': 4,
-            'friday': 5,
-            'saturday': 6
-        };
-
-        const startIndex = firstDayMap[preferences.firstDayOfWeek] || 1;
-
-        return [
-            ...ALL_WEEKDAYS.slice(startIndex),
-            ...ALL_WEEKDAYS.slice(0, startIndex)
-        ];
-    }, [preferences.firstDayOfWeek, t]);
+    const maxChartValue = useMemo(() => Math.max(...chartData, 1), [chartData]);
 
     const { productivityPercentage, productivityTrend } = useMemo(() => {
-        const totalBillableTime = entries
-            .filter(e => e.billable)
-            .reduce((acc, e) => acc + (e.endTime - e.startTime), 0);
-        
-        const productivity = totalHours > 0 ? (totalBillableTime / totalHours) * 100 : 0;
+        return calculateProductivityTrends(filteredEntries, entries, selectedPeriod);
+    }, [filteredEntries, entries, selectedPeriod]);
 
-        const now = new Date();
-        const last7DaysStart = new Date();
-        last7DaysStart.setDate(now.getDate() - 7);
-        const prev7DaysStart = new Date();
-        prev7DaysStart.setDate(now.getDate() - 14);
+    // Get productivity chart data
+    const productivityChartData = useMemo(() =>
+        getDailyProductivityData(filteredEntries, selectedPeriod),
+        [filteredEntries, selectedPeriod]
+    );
 
-        const entriesLast7Days = entries.filter(e => new Date(e.startTime) >= last7DaysStart && new Date(e.startTime) <= now);
-        const entriesPrev7Days = entries.filter(e => new Date(e.startTime) >= prev7DaysStart && new Date(e.startTime) < last7DaysStart);
-        
-        const totalHoursLast7 = entriesLast7Days.reduce((sum, e) => sum + (e.endTime - e.startTime), 0);
-        const billableHoursLast7 = entriesLast7Days.filter(e => e.billable).reduce((sum, e) => sum + (e.endTime - e.startTime), 0);
-        const productivityLast7 = totalHoursLast7 > 0 ? (billableHoursLast7 / totalHoursLast7) * 100 : 0;
-
-        const totalHoursPrev7 = entriesPrev7Days.reduce((sum, e) => sum + (e.endTime - e.startTime), 0);
-        const billableHoursPrev7 = entriesPrev7Days.filter(e => e.billable).reduce((sum, e) => sum + (e.endTime - e.startTime), 0);
-        const productivityPrev7 = totalHoursPrev7 > 0 ? (billableHoursPrev7 / totalHoursPrev7) * 100 : 0;
-
-        const trend = productivityPrev7 > 0 ? productivityLast7 - productivityPrev7 : productivityLast7;
-
-        return {
-            productivityPercentage: Math.round(productivity),
-            productivityTrend: Math.round(trend)
-        };
-    }, [entries, totalHours]);
+    const productivityChartLabels = useMemo(() =>
+        getProductivityChartLabels(selectedPeriod),
+        [selectedPeriod]
+    );
 
 
     const projectReports: ProjectReport[] = useMemo(() => {
         const reports: { [key: string]: { time: number, earnings: number } } = {};
 
-        entries.forEach(entry => {
+        filteredEntries.forEach(entry => {
             if (!entry.projectId) return;
 
             if (!reports[entry.projectId]) {
@@ -119,17 +105,17 @@ export const SummaryReport: React.FC<SummaryReportProps> = ({ entries, projects,
             };
         });
 
-    }, [entries, projects, language]);
+    }, [filteredEntries, projects, language]);
 
     const clientReports = useMemo(() => {
         return clients.map(client => {
             const clientProjects = projects.filter(p => p.clientId === client.id);
             const projectIds = clientProjects.map(p => p.id);
-            const clientEntries = entries.filter(e => e.projectId && projectIds.includes(e.projectId));
-    
+            const clientEntries = filteredEntries.filter(e => e.projectId && projectIds.includes(e.projectId));
+
             const timeLogged = clientEntries.reduce((acc, e) => acc + (e.endTime - e.startTime), 0);
             const earnings = clientEntries.reduce((acc, e) => acc + calculateEntryEarnings(e, projects), 0);
-    
+
             return {
                 id: client.id,
                 name: client.name,
@@ -137,19 +123,46 @@ export const SummaryReport: React.FC<SummaryReportProps> = ({ entries, projects,
                 totalEarnings: formatCurrency(earnings, language),
             };
         }).sort((a, b) => a.name.localeCompare(b.name));
-    }, [clients, projects, entries, language]);
+    }, [clients, projects, filteredEntries, language]);
 
+
+    // Show empty state if no entries at all
+    if (entries.length === 0) {
+        return (
+            <div className="text-center py-20">
+                <div className="mb-6">
+                    <h3 className="text-xl font-semibold text-white mb-4">{t('reportsPage.summaryTitle')}</h3>
+                </div>
+                <div className="bg-gray-800 rounded-lg border border-gray-700 p-12">
+                    <div className="text-gray-400 mb-4">
+                        <span className="material-symbols-outlined text-6xl">analytics</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">No Time Entries Yet</h3>
+                    <p className="text-gray-400 mb-6">Start tracking your time to see detailed reports and analytics.</p>
+                    <div className="text-sm text-gray-500">
+                        <p>• Track time with the timer on the Dashboard</p>
+                        <p>• Add manual time entries for past work</p>
+                        <p>• Create projects and clients to organize your work</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
             <div className="mb-6">
                 <h3 className="text-xl font-semibold text-white mb-4">{t('reportsPage.summaryTitle')}</h3>
                 <div className="max-w-xs">
-                    <select className="form-select w-full rounded-lg border-gray-600 bg-gray-800 text-white focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)]">
-                        <option>{t('reportsPage.timeFilter.all')}</option>
-                        <option>{t('reportsPage.timeFilter.30days')}</option>
-                        <option>{t('reportsPage.timeFilter.quarter')}</option>
-                        <option>{t('reportsPage.timeFilter.year')}</option>
+                    <select
+                        value={selectedPeriod}
+                        onChange={(e) => setSelectedPeriod(e.target.value as TimeFilterPeriod)}
+                        className="form-select w-full rounded-lg border-gray-600 bg-gray-800 text-white focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)]"
+                    >
+                        <option value="all">{t('reportsPage.timeFilter.all')}</option>
+                        <option value="30days">{t('reportsPage.timeFilter.30days')}</option>
+                        <option value="quarter">{t('reportsPage.timeFilter.quarter')}</option>
+                        <option value="year">{t('reportsPage.timeFilter.year')}</option>
                     </select>
                 </div>
             </div>
@@ -157,21 +170,21 @@ export const SummaryReport: React.FC<SummaryReportProps> = ({ entries, projects,
                 <div className="rounded-lg border border-gray-700 bg-gray-800 p-6">
                     <div className="flex items-center justify-between">
                         <h4 className="text-lg font-medium text-white">{t('reportsPage.totalEarningsTitle')}</h4>
-                        <span className="text-sm text-gray-400">{t('reportsPage.timeFilter.all')}</span>
+                        <span className="text-sm text-gray-400">{t(`reportsPage.timeFilter.${selectedPeriod}`)}</span>
                     </div>
                     <p className="mt-2 text-4xl font-bold text-white">{formatCurrency(totalEarnings, language)}</p>
                     <div className="mt-1 flex items-center gap-1 text-sm font-medium text-gray-400">
                         <span>{t('reportsPage.totalTime', { duration: formatDuration(totalHours) })}</span>
                     </div>
                     <div className="mt-6 h-48">
-                        <div className="grid h-full grid-flow-col items-end justify-items-center gap-2 sm:gap-4">
-                            {weeklyEarnings.map((earning, index) => (
-                                <div key={index} className="w-full rounded-t-md bg-[var(--primary-color)] transition-all" style={{height: `${(earning / maxWeeklyEarning) * 100}%`}}></div>
+                        <div className="grid h-full grid-flow-col items-end justify-items-center gap-1 sm:gap-2">
+                            {chartData.map((earning, index) => (
+                                <div key={index} className="w-full rounded-t-md bg-[var(--primary-color)] transition-all" style={{height: `${(earning / maxChartValue) * 100}%`}}></div>
                             ))}
                         </div>
-                        <div className="mt-2 grid grid-cols-7 text-center text-xs font-medium text-gray-400">
-                            {weekdayLabels.map((label, index) => (
-                                <span key={index}>{label}</span>
+                        <div className="mt-2 grid grid-flow-col justify-items-center gap-1 text-xs text-gray-400 sm:gap-2">
+                            {chartLabels.map((label, index) => (
+                                <span key={index} className="truncate" title={label}>{label}</span>
                             ))}
                         </div>
                     </div>
@@ -179,20 +192,39 @@ export const SummaryReport: React.FC<SummaryReportProps> = ({ entries, projects,
                 <div className="rounded-lg border border-gray-700 bg-gray-800 p-6">
                     <div className="flex items-center justify-between">
                         <h4 className="text-lg font-medium text-white">{t('reportsPage.productivityTitle')}</h4>
-                        <span className="text-sm text-gray-400">{t('reportsPage.last30days')}</span>
+                        <span className="text-sm text-gray-400">{t(`reportsPage.timeFilter.${selectedPeriod}`)}</span>
                     </div>
-                    <p className="mt-2 text-4xl font-bold text-white">{productivityPercentage}%</p>
-                    <div className={`mt-1 flex items-center gap-1 text-sm font-medium ${productivityTrend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                        <span className="material-symbols-outlined text-base"> {productivityTrend >= 0 ? 'trending_up' : 'trending_down'} </span>
-                        <span>{Math.abs(productivityTrend)}%</span>
-                    </div>
+                    {filteredEntries.length > 0 ? (
+                        <>
+                            <p className="mt-2 text-4xl font-bold text-white">
+                                {isNaN(productivityPercentage) ? '0' : productivityPercentage}%
+                            </p>
+                            {!isNaN(productivityTrend) ? (
+                                <div className={`mt-1 flex items-center gap-1 text-sm font-medium ${productivityTrend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    <span className="material-symbols-outlined text-base"> {productivityTrend >= 0 ? 'trending_up' : 'trending_down'} </span>
+                                    <span>{Math.abs(productivityTrend)}%</span>
+                                </div>
+                            ) : (
+                                <div className="mt-1 flex items-center gap-1 text-sm font-medium text-gray-400">
+                                    <span className="material-symbols-outlined text-base">info</span>
+                                    <span>No comparison data</span>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <p className="mt-2 text-4xl font-bold text-gray-500">--</p>
+                            <div className="mt-1 flex items-center gap-1 text-sm font-medium text-gray-400">
+                                <span className="material-symbols-outlined text-base">info</span>
+                                <span>No time entries for this period</span>
+                            </div>
+                        </>
+                    )}
                     <div className="mt-6 h-48">
-                        <svg className="h-full w-full" fill="none" preserveAspectRatio="none" viewBox="0 0 472 150" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="var(--primary-color)" strokeLinecap="round" strokeWidth="3"></path>
-                            <path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H0V109Z" fill="url(#productivity-chart-gradient)"></path>
-                            <defs><linearGradient gradientUnits="userSpaceOnUse" id="productivity-chart-gradient" x1="236" x2="236" y1="1" y2="149"><stop stopColor="var(--primary-color)" stopOpacity="0.3"></stop><stop offset="1" stopColor="var(--primary-color)" stopOpacity="0"></stop></linearGradient></defs>
-                        </svg>
-                        <div className="mt-2 flex justify-around text-xs font-medium text-gray-400"><span>W1</span><span>W2</span><span>W3</span><span>W4</span></div>
+                        <ProductivityChart
+                            data={productivityChartData}
+                            labels={productivityChartLabels}
+                        />
                     </div>
                 </div>
             </div>

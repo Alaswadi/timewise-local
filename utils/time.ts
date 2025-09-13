@@ -149,6 +149,81 @@ export const getWeeklyEarnings = (entries: TimeEntry[], projects: Project[], fir
     return weekData;
 }
 
+// Time filter types
+export type TimeFilterPeriod = 'all' | '30days' | 'quarter' | 'year';
+
+// Get date range for a time filter period
+export const getTimeFilterRange = (period: TimeFilterPeriod): { start: Date; end: Date } => {
+    const now = new Date();
+    const end = new Date(now);
+    end.setHours(23, 59, 59, 999);
+
+    let start: Date;
+
+    switch (period) {
+        case '30days':
+            start = new Date(now);
+            start.setDate(now.getDate() - 30);
+            start.setHours(0, 0, 0, 0);
+            break;
+        case 'quarter':
+            start = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+            start.setHours(0, 0, 0, 0);
+            break;
+        case 'year':
+            start = new Date(now.getFullYear(), 0, 1);
+            start.setHours(0, 0, 0, 0);
+            break;
+        case 'all':
+        default:
+            start = new Date(0); // Beginning of time
+            break;
+    }
+
+    return { start, end };
+};
+
+// Filter entries by time period
+export const filterEntriesByPeriod = (entries: TimeEntry[], period: TimeFilterPeriod): TimeEntry[] => {
+    if (period === 'all') {
+        return entries;
+    }
+
+    const { start, end } = getTimeFilterRange(period);
+
+    return entries.filter(entry => {
+        const entryTime = new Date(entry.startTime).getTime();
+        return entryTime >= start.getTime() && entryTime <= end.getTime();
+    });
+};
+
+// Generate chart data based on time period
+export const getChartDataForPeriod = (
+    entries: TimeEntry[],
+    projects: Project[],
+    period: TimeFilterPeriod,
+    firstDayOfWeek: string = 'monday'
+): number[] => {
+    const filteredEntries = filterEntriesByPeriod(entries, period);
+
+    switch (period) {
+        case 'all':
+            // For all time, show monthly data for the last 12 months
+            return getMonthlyEarnings(filteredEntries, projects, 12);
+        case '30days':
+            // For 30 days, show daily data
+            return getDailyEarnings(filteredEntries, projects, 30);
+        case 'quarter':
+            // For quarter, show weekly data
+            return getWeeklyEarningsForPeriod(filteredEntries, projects, 13); // ~13 weeks in a quarter
+        case 'year':
+            // For year, show monthly data
+            return getMonthlyEarnings(filteredEntries, projects, 12);
+        default:
+            return getWeeklyEarnings(filteredEntries, projects, firstDayOfWeek);
+    }
+};
+
 // Manual time entry utilities
 export const parseDurationInput = (input: string): number | null => {
     if (!input || typeof input !== 'string') return null;
@@ -326,4 +401,295 @@ export const createTimestampsFromDateAndDuration = (
         startTimestamp: startTimestamp.getTime(),
         endTimestamp: endTimestamp.getTime()
     };
+};
+
+// Get daily earnings for a specified number of days
+export const getDailyEarnings = (entries: TimeEntry[], projects: Project[], days: number): number[] => {
+    const dailyData = Array(days).fill(0);
+    const today = new Date();
+
+    for (let i = 0; i < days; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - (days - 1 - i));
+
+        const dayEntries = entries.filter(entry => isSameDay(new Date(entry.startTime), date));
+        const totalEarnings = dayEntries.reduce((sum, entry) => sum + calculateEntryEarnings(entry, projects), 0);
+        dailyData[i] = totalEarnings;
+    }
+
+    return dailyData;
+};
+
+// Get weekly earnings for a specified number of weeks
+export const getWeeklyEarningsForPeriod = (entries: TimeEntry[], projects: Project[], weeks: number): number[] => {
+    const weeklyData = Array(weeks).fill(0);
+    const today = new Date();
+
+    for (let i = 0; i < weeks; i++) {
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - (weeks - 1 - i) * 7);
+        weekStart.setHours(0, 0, 0, 0);
+
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        weekEnd.setHours(23, 59, 59, 999);
+
+        const weekEntries = entries.filter(entry => {
+            const entryTime = new Date(entry.startTime).getTime();
+            return entryTime >= weekStart.getTime() && entryTime <= weekEnd.getTime();
+        });
+
+        const totalEarnings = weekEntries.reduce((sum, entry) => sum + calculateEntryEarnings(entry, projects), 0);
+        weeklyData[i] = totalEarnings;
+    }
+
+    return weeklyData;
+};
+
+// Get monthly earnings for a specified number of months
+export const getMonthlyEarnings = (entries: TimeEntry[], projects: Project[], months: number): number[] => {
+    const monthlyData = Array(months).fill(0);
+    const today = new Date();
+
+    for (let i = 0; i < months; i++) {
+        const monthStart = new Date(today.getFullYear(), today.getMonth() - (months - 1 - i), 1);
+        monthStart.setHours(0, 0, 0, 0);
+
+        const monthEnd = new Date(today.getFullYear(), today.getMonth() - (months - 1 - i) + 1, 0);
+        monthEnd.setHours(23, 59, 59, 999);
+
+        const monthEntries = entries.filter(entry => {
+            const entryTime = new Date(entry.startTime).getTime();
+            return entryTime >= monthStart.getTime() && entryTime <= monthEnd.getTime();
+        });
+
+        const totalEarnings = monthEntries.reduce((sum, entry) => sum + calculateEntryEarnings(entry, projects), 0);
+        monthlyData[i] = totalEarnings;
+    }
+
+    return monthlyData;
+};
+
+// Get chart labels based on time period
+export const getChartLabelsForPeriod = (period: TimeFilterPeriod): string[] => {
+    const today = new Date();
+
+    switch (period) {
+        case '30days':
+            return Array.from({ length: 30 }, (_, i) => {
+                const date = new Date(today);
+                date.setDate(today.getDate() - (29 - i));
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+        case 'quarter':
+            return Array.from({ length: 13 }, (_, i) => {
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - (12 - i) * 7);
+                return `W${i + 1}`;
+            });
+        case 'year':
+            return Array.from({ length: 12 }, (_, i) => {
+                const month = new Date(today.getFullYear(), today.getMonth() - (11 - i), 1);
+                return month.toLocaleDateString('en-US', { month: 'short' });
+            });
+        case 'all':
+            return Array.from({ length: 12 }, (_, i) => {
+                const month = new Date(today.getFullYear(), today.getMonth() - (11 - i), 1);
+                return month.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+            });
+        default:
+            return ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    }
+};
+
+// Calculate productivity for a set of entries
+const calculateProductivity = (entries: TimeEntry[]): number => {
+    if (entries.length === 0) return 0;
+
+    const totalHours = entries.reduce((sum, e) => sum + (e.endTime - e.startTime), 0);
+    const billableHours = entries.filter(e => e.billable).reduce((sum, e) => sum + (e.endTime - e.startTime), 0);
+
+    return totalHours > 0 ? (billableHours / totalHours) * 100 : 0;
+};
+
+// Calculate productivity trends based on filtered entries and time period
+export const calculateProductivityTrends = (filteredEntries: TimeEntry[], allEntries: TimeEntry[], period: TimeFilterPeriod): { percentage: number; trend: number } => {
+    // Calculate current period productivity from filtered entries
+    const currentProductivity = calculateProductivity(filteredEntries);
+
+
+
+    // If no data in current period, return zeros
+    if (filteredEntries.length === 0) {
+        return {
+            percentage: 0,
+            trend: 0
+        };
+    }
+
+    // Get comparison period entries
+    const now = new Date();
+    let previousPeriodEntries: TimeEntry[] = [];
+
+    switch (period) {
+        case '30days': {
+            // Compare with previous 30 days (30-60 days ago)
+            const prev30DaysStart = new Date(now);
+            prev30DaysStart.setDate(now.getDate() - 60);
+            const prev30DaysEnd = new Date(now);
+            prev30DaysEnd.setDate(now.getDate() - 30);
+
+            previousPeriodEntries = allEntries.filter(e => {
+                const entryTime = new Date(e.startTime);
+                return entryTime >= prev30DaysStart && entryTime < prev30DaysEnd;
+            });
+            break;
+        }
+        case 'quarter': {
+            // Compare with previous quarter
+            const currentQuarterStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+            const prevQuarterStart = new Date(currentQuarterStart);
+            prevQuarterStart.setMonth(prevQuarterStart.getMonth() - 3);
+            const prevQuarterEnd = new Date(currentQuarterStart);
+
+            previousPeriodEntries = allEntries.filter(e => {
+                const entryTime = new Date(e.startTime);
+                return entryTime >= prevQuarterStart && entryTime < prevQuarterEnd;
+            });
+            break;
+        }
+        case 'year': {
+            // Compare with previous year
+            const currentYearStart = new Date(now.getFullYear(), 0, 1);
+            const prevYearStart = new Date(now.getFullYear() - 1, 0, 1);
+            const prevYearEnd = new Date(now.getFullYear(), 0, 1);
+
+            previousPeriodEntries = allEntries.filter(e => {
+                const entryTime = new Date(e.startTime);
+                return entryTime >= prevYearStart && entryTime < prevYearEnd;
+            });
+            break;
+        }
+        case 'all':
+        default: {
+            // For all time, compare last 30 days vs previous 30 days
+            const last30DaysStart = new Date(now);
+            last30DaysStart.setDate(now.getDate() - 30);
+            const prev30DaysStart = new Date(now);
+            prev30DaysStart.setDate(now.getDate() - 60);
+
+            previousPeriodEntries = allEntries.filter(e => {
+                const entryTime = new Date(e.startTime);
+                return entryTime >= prev30DaysStart && entryTime < last30DaysStart;
+            });
+            break;
+        }
+    }
+
+    // Calculate previous period productivity
+    const previousProductivity = calculateProductivity(previousPeriodEntries);
+
+    // Calculate trend
+    let trend = 0;
+    if (previousProductivity > 0) {
+        trend = currentProductivity - previousProductivity;
+    } else if (currentProductivity > 0) {
+        trend = currentProductivity; // If no previous data, show current as positive trend
+    }
+
+    // Ensure we return valid numbers
+    const finalPercentage = isNaN(currentProductivity) ? 0 : Math.round(currentProductivity);
+    const finalTrend = isNaN(trend) ? 0 : Math.round(trend);
+
+
+
+    return {
+        percentage: finalPercentage,
+        trend: finalTrend
+    };
+};
+
+// Get daily productivity data for chart display
+export const getDailyProductivityData = (entries: TimeEntry[], period: TimeFilterPeriod): number[] => {
+    const now = new Date();
+    let days: number;
+
+    // Determine number of days based on period
+    switch (period) {
+        case '30days':
+            days = 30;
+            break;
+        case 'quarter':
+            days = 90; // ~3 months
+            break;
+        case 'year':
+            days = 365;
+            break;
+        case 'all':
+        default:
+            days = 30; // Default to 30 days for all time
+            break;
+    }
+
+    const productivityData = Array(days).fill(0);
+
+    for (let i = 0; i < days; i++) {
+        const date = new Date(now);
+        date.setDate(now.getDate() - (days - 1 - i));
+
+        // Get entries for this specific day
+        const dayEntries = entries.filter(entry => isSameDay(new Date(entry.startTime), date));
+
+        if (dayEntries.length > 0) {
+            const totalTime = dayEntries.reduce((sum, e) => sum + (e.endTime - e.startTime), 0);
+            const billableTime = dayEntries.filter(e => e.billable).reduce((sum, e) => sum + (e.endTime - e.startTime), 0);
+
+            const productivity = totalTime > 0 ? (billableTime / totalTime) * 100 : 0;
+            productivityData[i] = Math.round(productivity);
+        }
+    }
+
+    return productivityData;
+};
+
+// Get productivity chart labels for different periods
+export const getProductivityChartLabels = (period: TimeFilterPeriod): string[] => {
+    const now = new Date();
+    let days: number;
+    let labelFrequency: number; // Show every Nth label to avoid crowding
+
+    switch (period) {
+        case '30days':
+            days = 30;
+            labelFrequency = 5; // Show every 5th day
+            break;
+        case 'quarter':
+            days = 90;
+            labelFrequency = 15; // Show every 15th day
+            break;
+        case 'year':
+            days = 365;
+            labelFrequency = 30; // Show every 30th day (roughly monthly)
+            break;
+        case 'all':
+        default:
+            days = 30;
+            labelFrequency = 5;
+            break;
+    }
+
+    return Array.from({ length: days }, (_, i) => {
+        const date = new Date(now);
+        date.setDate(now.getDate() - (days - 1 - i));
+
+        // Only show label if it's at the frequency interval or it's the first/last day
+        if (i % labelFrequency === 0 || i === 0 || i === days - 1) {
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                ...(period === 'year' && { year: '2-digit' })
+            });
+        }
+        return ''; // Empty string for days without labels
+    });
 };
