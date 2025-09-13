@@ -106,27 +106,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Validate session and refresh user data
   const refreshUser = useCallback(async (): Promise<void> => {
     const token = getStoredToken();
+    console.log('🔍 Refreshing user, token exists:', !!token);
+
     if (!token) {
+      console.log('❌ No token found, setting user to null');
       setUser(null);
       setIsLoading(false);
       return;
     }
 
     try {
+      console.log('📡 Validating session with API...');
       const response = await authApi.validateSession(token);
+      console.log('📡 Session validation response:', response);
+
       if (response.success && response.data?.user) {
+        console.log('✅ Session valid, user:', response.data.user.username);
         setUser(response.data.user);
         storeUser(response.data.user);
       } else {
+        console.log('❌ Session invalid, clearing data');
         // Invalid session, clear stored data
         removeToken();
         setUser(null);
       }
     } catch (error) {
-      console.error('Session validation failed:', error);
+      console.error('💥 Session validation failed:', error);
       removeToken();
       setUser(null);
     } finally {
+      console.log('🏁 Setting loading to false');
       setIsLoading(false);
     }
   }, [getStoredToken, storeUser, removeToken]);
@@ -283,14 +292,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Initialize auth state on mount
   useEffect(() => {
     const initializeAuth = async () => {
+      console.log('🔄 Initializing auth...');
+
       // First, try to get user from localStorage for immediate UI update
       const storedUser = getStoredUser();
       if (storedUser) {
+        console.log('👤 Found stored user:', storedUser.username);
         setUser(storedUser);
+      } else {
+        console.log('❌ No stored user found');
       }
 
       // Then validate the session
+      console.log('🔍 Validating session...');
       await refreshUser();
+      console.log('✅ Auth initialization complete');
     };
 
     initializeAuth();

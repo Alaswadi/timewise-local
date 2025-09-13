@@ -39,6 +39,7 @@
     "timeEntry": {
         "noProject": "لا يوجد مشروع",
         "restartLabel": "إعادة تشغيل الموقت لـ {{description}}",
+        "editLabel": "تعديل الإدخال: {{description}}",
         "deleteLabel": "حذف الإدخال: {{description}}",
         "billable": "مدفوع"
     },
@@ -324,7 +325,9 @@
     },
     "manualEntry": {
         "title": "إدخال وقت يدوي",
+        "editTitle": "تعديل إدخال الوقت",
         "subtitle": "أضف عمل سابق لم يتم تتبعه",
+        "editSubtitle": "حدث تفاصيل إدخال الوقت",
         "button": "إضافة إدخال يدوي",
         "form": {
             "description": "الوصف",
@@ -348,7 +351,7 @@
             "dateRequired": "التاريخ مطلوب",
             "dateInFuture": "لا يمكن أن يكون التاريخ في المستقبل",
             "durationRequired": "المدة مطلوبة",
-            "durationInvalid": "تنسيق المدة غير صحيح. استخدم HH:MM أو الدقائق",
+            "durationInvalid": "تنسيق المدة غير صحيح. استخدم H:MM (مثل 1:30 لساعة و30 دقيقة) أو الدقائق",
             "durationTooLong": "لا يمكن أن تتجاوز المدة 24 ساعة",
             "startTimeRequired": "وقت البداية مطلوب",
             "endTimeRequired": "وقت النهاية مطلوب",
@@ -360,7 +363,8 @@
     },
     "common": {
         "cancel": "إلغاء",
-        "save": "حفظ"
+        "save": "حفظ",
+        "update": "تحديث"
     },
     "app": {
         "noDescription": "لا يوجد وصف",

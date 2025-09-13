@@ -39,6 +39,7 @@
     "timeEntry": {
         "noProject": "No Project",
         "restartLabel": "Restart timer for {{description}}",
+        "editLabel": "Edit entry: {{description}}",
         "deleteLabel": "Delete entry: {{description}}",
         "billable": "Billable"
     },
@@ -324,7 +325,9 @@
     },
     "manualEntry": {
         "title": "Manual Time Entry",
+        "editTitle": "Edit Time Entry",
         "subtitle": "Add past work that wasn't tracked",
+        "editSubtitle": "Update your time entry details",
         "button": "Add Manual Entry",
         "form": {
             "description": "Description",
@@ -348,7 +351,7 @@
             "dateRequired": "Date is required",
             "dateInFuture": "Date cannot be in the future",
             "durationRequired": "Duration is required",
-            "durationInvalid": "Invalid duration format. Use HH:MM or minutes",
+            "durationInvalid": "Invalid duration format. Use H:MM (e.g., 1:30 for 1h 30m) or minutes",
             "durationTooLong": "Duration cannot exceed 24 hours",
             "startTimeRequired": "Start time is required",
             "endTimeRequired": "End time is required",
@@ -360,7 +363,8 @@
     },
     "common": {
         "cancel": "Cancel",
-        "save": "Save"
+        "save": "Save",
+        "update": "Update"
     },
     "app": {
         "noDescription": "No description",

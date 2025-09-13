@@ -6,12 +6,13 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface TimeEntryListProps {
   entries: TimeEntry[];
   onDelete: (id: string) => void;
+  onEdit?: (entry: TimeEntry) => void;
   onRestart: (entry: TimeEntry) => void;
   projects: Project[];
   tasks: Task[];
 }
 
-export const TimeEntryList: React.FC<TimeEntryListProps> = ({ entries, onDelete, onRestart, projects, tasks }) => {
+export const TimeEntryList: React.FC<TimeEntryListProps> = ({ entries, onDelete, onEdit, onRestart, projects, tasks }) => {
   const { t } = useLanguage();
   if (entries.length === 0) {
     return (
@@ -24,7 +25,7 @@ export const TimeEntryList: React.FC<TimeEntryListProps> = ({ entries, onDelete,
   return (
     <div className="space-y-3">
       {entries.map(entry => (
-        <TimeEntryItem key={entry.id} entry={entry} onDelete={onDelete} onRestart={onRestart} projects={projects} tasks={tasks} />
+        <TimeEntryItem key={entry.id} entry={entry} onDelete={onDelete} onEdit={onEdit} onRestart={onRestart} projects={projects} tasks={tasks} />
       ))}
     </div>
   );

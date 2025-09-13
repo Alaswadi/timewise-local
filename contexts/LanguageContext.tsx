@@ -128,10 +128,15 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [language]);
   
   const t = useCallback((key: string, options?: { [key: string]: string | number }): string => {
+    // If translations aren't loaded yet, return the key as fallback
+    if (!translations || (!translations[language] && !translations['en'])) {
+      return key;
+    }
+
     const keys = key.split('.');
-    
+
     const langTranslations = translations[language];
-    
+
     let result = langTranslations as any;
     for (const k of keys) {
       result = result?.[k];
@@ -145,7 +150,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         break;
       }
     }
-    
+
     let finalString = result || key;
 
     if (options) {

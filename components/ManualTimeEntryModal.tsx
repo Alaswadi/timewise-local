@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Project, Task } from '../types';
+import { Project, Task, TimeEntry } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { 
   parseDurationInput, 
@@ -12,6 +12,7 @@ import {
 } from '../utils/time';
 
 interface ManualTimeEntryData {
+  id?: string; // Include ID when editing
   description: string;
   projectId: string;
   taskId?: string;
@@ -28,6 +29,7 @@ interface ManualTimeEntryModalProps {
   onSave: (data: ManualTimeEntryData) => void;
   projects: Project[];
   tasks: Task[];
+  editingEntry?: TimeEntry | null;
 }
 
 export const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
@@ -35,7 +37,8 @@ export const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
   onClose,
   onSave,
   projects,
-  tasks
+  tasks,
+  editingEntry
 }) => {
   const { t } = useLanguage();
   
@@ -54,22 +57,49 @@ export const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reset form when modal opens/closes
+  // Reset form when modal opens/closes or populate with editing entry
   useEffect(() => {
     if (isOpen) {
-      setDescription('');
-      setProjectId(projects[0]?.id || '');
-      setTaskId('');
-      setDate(new Date().toISOString().split('T')[0]); // Today's date
-      setDurationInput('');
-      setStartTime('09:00');
-      setEndTime('17:00');
-      setBillable(true);
-      setUseTimeRange(false);
+      if (editingEntry) {
+        // Populate form with existing entry data
+        setDescription(editingEntry.description);
+        setProjectId(editingEntry.projectId || '');
+        setTaskId(editingEntry.taskId || '');
+        setBillable(editingEntry.billable);
+
+        // Set date from entry start time
+        const entryDate = new Date(editingEntry.startTime);
+        setDate(entryDate.toISOString().split('T')[0]);
+
+        // Calculate duration and set time fields
+        const duration = editingEntry.endTime - editingEntry.startTime;
+        const hours = Math.floor(duration / (1000 * 60 * 60));
+        const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+        setDurationInput(`${hours}:${minutes.toString().padStart(2, '0')}`);
+
+        // Set start and end times
+        const startTimeStr = formatTimeForInput(new Date(editingEntry.startTime));
+        const endTimeStr = formatTimeForInput(new Date(editingEntry.endTime));
+        setStartTime(startTimeStr);
+        setEndTime(endTimeStr);
+
+        setUseTimeRange(false); // Default to duration mode for editing
+      } else {
+        // Initialize for new entry
+        setDescription('');
+        setProjectId(projects[0]?.id || '');
+        setTaskId('');
+        setDate(new Date().toISOString().split('T')[0]); // Today's date
+        setDurationInput('');
+        setStartTime('09:00');
+        setEndTime('17:00');
+        setBillable(true);
+        setUseTimeRange(false);
+      }
       setErrors({});
       setIsSubmitting(false);
     }
-  }, [isOpen, projects]);
+  }, [isOpen, projects, editingEntry]);
 
   // Filter tasks based on selected project
   const filteredTasks = tasks.filter(task => task.projectId === projectId);
@@ -166,8 +196,13 @@ export const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
         }
         duration = timestamps.endTimestamp - timestamps.startTimestamp;
       } else {
-        duration = parseDurationInput(durationInput)!;
-        timestamps = createTimestampsFromDateAndDuration(date, duration, startTime);
+        const parsedDuration = parseDurationInput(durationInput);
+        if (parsedDuration === null) {
+          setErrors({ duration: t('manualEntry.validation.durationInvalid') });
+          return;
+        }
+        duration = parsedDuration;
+        timestamps = createTimestampsFromDateAndDuration(date, duration);
         if (!timestamps) {
           setErrors({ duration: 'Failed to create timestamps from duration' });
           return;
@@ -175,6 +210,7 @@ export const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
       }
 
       const entryData: ManualTimeEntryData = {
+        ...(editingEntry && { id: editingEntry.id }), // Include ID when editing
         description: description.trim(),
         projectId,
         taskId: taskId || undefined,
@@ -213,8 +249,12 @@ export const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
         className="bg-gray-800 rounded-lg shadow-xl w-full max-w-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold text-white mb-2">{t('manualEntry.title')}</h2>
-        <p className="text-gray-400 mb-6">{t('manualEntry.subtitle')}</p>
+        <h2 className="text-2xl font-bold text-white mb-2">
+          {editingEntry ? t('manualEntry.editTitle') : t('manualEntry.title')}
+        </h2>
+        <p className="text-gray-400 mb-6">
+          {editingEntry ? t('manualEntry.editSubtitle') : t('manualEntry.subtitle')}
+        </p>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Description */}
@@ -406,7 +446,7 @@ export const ManualTimeEntryModal: React.FC<ManualTimeEntryModalProps> = ({
               className="px-4 py-2 rounded-lg text-white bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/80 transition-colors disabled:opacity-50"
               disabled={isSubmitting}
             >
-              {isSubmitting ? '...' : t('common.save')}
+              {isSubmitting ? '...' : (editingEntry ? t('common.update') : t('common.save'))}
             </button>
           </div>
         </form>

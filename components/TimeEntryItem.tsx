@@ -3,6 +3,7 @@ import { TimeEntry, Project, Task } from '../types';
 import { formatDuration, formatCurrency, calculateEntryEarnings } from '../utils/time';
 import { PlayIcon } from './icons/PlayIcon';
 import { TrashIcon } from './icons/TrashIcon';
+import { EditIcon } from './icons/EditIcon';
 import { DollarIcon } from './icons/DollarIcon';
 import { ManualIcon } from './icons/ManualIcon';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -10,12 +11,13 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface TimeEntryItemProps {
   entry: TimeEntry;
   onDelete: (id: string) => void;
+  onEdit?: (entry: TimeEntry) => void;
   onRestart?: (entry: TimeEntry) => void;
   projects: Project[];
   tasks: Task[];
 }
 
-export const TimeEntryItem: React.FC<TimeEntryItemProps> = ({ entry, onDelete, onRestart, projects, tasks }) => {
+export const TimeEntryItem: React.FC<TimeEntryItemProps> = ({ entry, onDelete, onEdit, onRestart, projects, tasks }) => {
   const { t, language } = useLanguage();
   const projectName = projects.find(p => p.id === entry.projectId)?.name || t('timeEntry.noProject');
   const taskName = tasks.find(t => t.id === entry.taskId)?.name;
@@ -46,8 +48,17 @@ export const TimeEntryItem: React.FC<TimeEntryItemProps> = ({ entry, onDelete, o
         <span className="font-mono font-semibold text-white">
           {formatDuration(entry.endTime - entry.startTime)}
         </span>
+        {onEdit && (
+            <button
+                onClick={() => onEdit(entry)}
+                className="text-gray-400 hover:text-yellow-400 p-2 rounded-full hover:bg-gray-700/50 transition-colors"
+                aria-label={t('timeEntry.editLabel', { description: entry.description })}
+            >
+                <EditIcon />
+            </button>
+        )}
         {onRestart && (
-            <button 
+            <button
                 onClick={() => onRestart(entry)}
                 className="text-gray-400 hover:text-green-400 p-2 rounded-full hover:bg-gray-700/50 transition-colors"
                 aria-label={t('timeEntry.restartLabel', { description: entry.description })}

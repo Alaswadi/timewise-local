@@ -2,6 +2,7 @@ import React from 'react';
 import { Project, Task, TimeEntry } from '../types';
 import { formatDate, formatDuration, formatTime, formatCurrency, calculateEntryEarnings } from '../utils/time';
 import { TrashIcon } from './icons/TrashIcon';
+import { EditIcon } from './icons/EditIcon';
 import { DollarIcon } from './icons/DollarIcon';
 import { ManualIcon } from './icons/ManualIcon';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -9,11 +10,12 @@ import { useLanguage } from '../contexts/LanguageContext';
 interface TimeEntryTableProps {
   entries: TimeEntry[];
   onDelete: (id: string) => void;
+  onEdit?: (entry: TimeEntry) => void;
   projects: Project[];
   tasks: Task[];
 }
 
-export const TimeEntryTable: React.FC<TimeEntryTableProps> = ({ entries, onDelete, projects, tasks }) => {
+export const TimeEntryTable: React.FC<TimeEntryTableProps> = ({ entries, onDelete, onEdit, projects, tasks }) => {
   const { t, language } = useLanguage();
   const getProjectName = (projectId?: string) => projectId ? projects.find(p => p.id === projectId)?.name : t('list.notApplicable');
   const getTaskName = (taskId?: string) => taskId ? tasks.find(t => t.id === taskId)?.name : t('list.notApplicable');
@@ -64,13 +66,24 @@ export const TimeEntryTable: React.FC<TimeEntryTableProps> = ({ entries, onDelet
                   {entry.billable ? formatCurrency(calculateEntryEarnings(entry, projects), language) : t('list.notApplicable')}
                 </td>
                 <td data-label={t('list.actions')} className="px-6 py-3 md:py-4 text-end md:text-center block md:table-cell">
-                  <button
-                    onClick={() => onDelete(entry.id)}
-                    className="text-gray-500 hover:text-red-500 transition-colors duration-200 p-2 rounded-full hover:bg-gray-900/50"
-                    aria-label={t('timeEntry.deleteLabel', { description: entry.description })}
-                  >
-                    <TrashIcon />
-                  </button>
+                  <div className="flex items-center justify-end md:justify-center gap-2">
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(entry)}
+                        className="text-gray-500 hover:text-yellow-400 transition-colors duration-200 p-2 rounded-full hover:bg-gray-900/50"
+                        aria-label={t('timeEntry.editLabel', { description: entry.description })}
+                      >
+                        <EditIcon />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => onDelete(entry.id)}
+                      className="text-gray-500 hover:text-red-500 transition-colors duration-200 p-2 rounded-full hover:bg-gray-900/50"
+                      aria-label={t('timeEntry.deleteLabel', { description: entry.description })}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -28,6 +28,7 @@ interface DashboardProps {
   onStart: () => void;
   onStop: () => void;
   onDelete: (id: string) => void;
+  onEdit?: (entry: TimeEntry) => void;
   isActive: boolean;
   elapsedTime: number;
   onRestart: (entry: TimeEntry) => void;
@@ -107,9 +108,10 @@ export const Dashboard: React.FC<DashboardProps> = (props) => {
 
       <section className="mb-8">
         <h2 className="text-2xl font-bold text-neutral-100 mb-4">{t('dashboard.today')}</h2>
-        <TimeEntryList 
-            entries={todayEntries} 
-            onDelete={props.onDelete} 
+        <TimeEntryList
+            entries={todayEntries}
+            onDelete={props.onDelete}
+            onEdit={props.onEdit}
             onRestart={props.onRestart}
             projects={props.projects}
             tasks={props.tasks}

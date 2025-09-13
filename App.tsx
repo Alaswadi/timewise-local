@@ -8,6 +8,7 @@ import { TasksPage } from './components/TasksPage';
 import { ReportsPage } from './components/ReportsPage';
 import { SettingsPage } from './components/SettingsPage';
 import { ClientsPage } from './components/ClientsPage';
+import { ManualTimeEntryModal } from './components/ManualTimeEntryModal';
 import { TimeEntry, Project, Task, Client, NewClientPayload, NewProjectPayload, NewTaskPayload } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { useLanguage } from './contexts/LanguageContext';
@@ -20,6 +21,7 @@ import { createTimestampsFromDateAndTime, createTimestampsFromDateAndDuration } 
 export type View = 'Dashboard' | 'List' | 'Calendar' | 'Projects' | 'Tasks' | 'Reports' | 'Settings' | 'Clients';
 
 interface ManualTimeEntryData {
+  id?: string; // Include ID when editing
   description: string;
   projectId: string;
   taskId?: string;
@@ -118,6 +120,10 @@ const App: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>();
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>();
   const [isTimerBillable, setIsTimerBillable] = useState(true);
+
+  // Time entry editing state
+  const [editingTimeEntry, setEditingTimeEntry] = useState<TimeEntry | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Load timer state from localStorage on app initialization
   useEffect(() => {
@@ -290,30 +296,59 @@ const App: React.FC = () => {
       }
 
       if (!timestamps) {
-        console.error('Failed to create timestamps for manual entry');
+        console.error('Failed to create timestamps for entry');
         return;
       }
 
-      const newEntry: TimeEntry = {
-        id: uuidv4(),
-        description: data.description,
-        startTime: timestamps.startTimestamp,
-        endTime: timestamps.endTimestamp,
-        projectId: data.projectId,
-        taskId: data.taskId,
-        billable: data.billable,
-        userId: user.id,
-        isManual: true,
-      };
+      if (data.id) {
+        // Editing existing entry
+        const updatedEntry: TimeEntry = {
+          id: data.id,
+          description: data.description,
+          startTime: timestamps.startTimestamp,
+          endTime: timestamps.endTimestamp,
+          projectId: data.projectId,
+          taskId: data.taskId,
+          billable: data.billable,
+          userId: user.id,
+          isManual: true, // Mark as manual since it was edited
+        };
 
-      setEntries(prev => [newEntry, ...prev]);
+        setEntries(prev => prev.map(entry => entry.id === data.id ? updatedEntry : entry));
+        setEditingTimeEntry(null);
+        setIsEditModalOpen(false);
+        console.log('Time entry updated successfully');
+      } else {
+        // Adding new entry
+        const newEntry: TimeEntry = {
+          id: uuidv4(),
+          description: data.description,
+          startTime: timestamps.startTimestamp,
+          endTime: timestamps.endTimestamp,
+          projectId: data.projectId,
+          taskId: data.taskId,
+          billable: data.billable,
+          userId: user.id,
+          isManual: true,
+        };
 
-      // Show success message (optional)
-      console.log('Manual time entry added successfully');
+        setEntries(prev => [newEntry, ...prev]);
+        console.log('Manual time entry added successfully');
+      }
     } catch (error) {
-      console.error('Error adding manual time entry:', error);
+      console.error('Error processing time entry:', error);
     }
   }, [user]);
+
+  const handleEditTimeEntry = useCallback((entry: TimeEntry) => {
+    setEditingTimeEntry(entry);
+    setIsEditModalOpen(true);
+  }, []);
+
+  const handleEditModalClose = useCallback(() => {
+    setEditingTimeEntry(null);
+    setIsEditModalOpen(false);
+  }, []);
 
   // Client CRUD Handlers
   const handleAddClient = (clientPayload: NewClientPayload) => {
@@ -384,6 +419,7 @@ const App: React.FC = () => {
         onStart: isActive ? handleStop : handleStart,
         onStop: handleStop,
         onDelete: handleDeleteEntry,
+        onEdit: handleEditTimeEntry,
         isActive,
         elapsedTime,
         onRestart: handleStartNewTimer,
@@ -402,7 +438,7 @@ const App: React.FC = () => {
       case 'Dashboard':
         return <Dashboard {...dashboardProps} />;
       case 'List':
-        return <TimeEntryTable entries={entries} onDelete={handleDeleteEntry} projects={projects} tasks={tasks} />;
+        return <TimeEntryTable entries={entries} onDelete={handleDeleteEntry} onEdit={handleEditTimeEntry} projects={projects} tasks={tasks} />;
       case 'Calendar':
         return <CalendarView entries={entries} onDelete={handleDeleteEntry} projects={projects} tasks={tasks} />;
       case 'Projects':
@@ -437,8 +473,26 @@ const App: React.FC = () => {
     }
   };
 
+  // Show loading state while initializing
+  if (isLoading) {
+    return (
+      <div className="relative flex size-full min-h-screen flex-col text-white group/design-root overflow-x-hidden">
+        <div className="flex items-center justify-center min-h-screen bg-[#111827]">
+          <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <TimeWiseLogo className="h-20 w-20" size={80} />
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-4">TimeWise</h1>
+            <p className="text-gray-400 mb-8">Loading...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#38e07b] mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Show authentication modal for unauthenticated users
-  if (!isAuthenticated && !isLoading) {
+  if (!isAuthenticated) {
     return (
       <div className="relative flex size-full min-h-screen flex-col text-white group/design-root overflow-x-hidden">
         <div className="flex items-center justify-center min-h-screen bg-[#111827]">
@@ -477,6 +531,16 @@ const App: React.FC = () => {
               {renderView()}
           </div>
         </main>
+
+        {/* Time Entry Edit Modal */}
+        <ManualTimeEntryModal
+          isOpen={isEditModalOpen}
+          onClose={handleEditModalClose}
+          onSave={handleManualEntryAdd}
+          projects={projects}
+          tasks={tasks}
+          editingEntry={editingTimeEntry}
+        />
       </div>
     </ProtectedRoute>
   );
