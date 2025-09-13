@@ -85,6 +85,15 @@ const App: React.FC = () => {
       setClients([]);
       setProjects([]);
       setTasks([]);
+
+      // Clear timer state when not authenticated
+      setDescription('');
+      setIsActive(false);
+      setStartTime(0);
+      setElapsedTime(0);
+      setSelectedProjectId(undefined);
+      setSelectedTaskId(undefined);
+      setIsTimerBillable(true);
     }
   }, [isAuthenticated, user, isLoading]);
 
@@ -97,6 +106,39 @@ const App: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>();
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>();
   const [isTimerBillable, setIsTimerBillable] = useState(true);
+
+  // Load timer state from localStorage on app initialization
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const timerStorageKey = `timerState_${user.id}`;
+      const savedTimerState = localStorage.getItem(timerStorageKey);
+
+      if (savedTimerState) {
+        try {
+          const timerState = JSON.parse(savedTimerState);
+
+          // Restore timer state
+          setDescription(timerState.description || '');
+          setSelectedProjectId(timerState.selectedProjectId);
+          setSelectedTaskId(timerState.selectedTaskId);
+          setIsTimerBillable(timerState.isTimerBillable ?? true);
+
+          // If timer was active, calculate elapsed time and resume
+          if (timerState.isActive && timerState.startTime) {
+            const now = Date.now();
+            const calculatedElapsedTime = now - timerState.startTime;
+            setStartTime(timerState.startTime);
+            setElapsedTime(calculatedElapsedTime);
+            setIsActive(true);
+          }
+        } catch (error) {
+          console.error('Error loading timer state:', error);
+          // Clear corrupted timer state
+          localStorage.removeItem(timerStorageKey);
+        }
+      }
+    }
+  }, [isAuthenticated, user]);
 
   // Set default project on load
   useEffect(() => {
@@ -129,6 +171,22 @@ const App: React.FC = () => {
       localStorage.setItem(`tasks_${user.id}`, JSON.stringify(tasks));
     }
   }, [tasks, user, isAuthenticated]);
+
+  // Save timer state to localStorage whenever it changes
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      const timerStorageKey = `timerState_${user.id}`;
+      const timerState = {
+        description,
+        isActive,
+        startTime,
+        selectedProjectId,
+        selectedTaskId,
+        isTimerBillable,
+      };
+      localStorage.setItem(timerStorageKey, JSON.stringify(timerState));
+    }
+  }, [description, isActive, startTime, selectedProjectId, selectedTaskId, isTimerBillable, user, isAuthenticated]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
@@ -181,6 +239,10 @@ const App: React.FC = () => {
     setDescription('');
     setElapsedTime(0);
     setStartTime(0);
+
+    // Clear timer state from localStorage when stopped
+    const timerStorageKey = `timerState_${user.id}`;
+    localStorage.removeItem(timerStorageKey);
   }, [isActive, description, startTime, selectedProjectId, selectedTaskId, isTimerBillable, t, user]);
   
   const handleStartNewTimer = (entryToRestart: TimeEntry) => {
