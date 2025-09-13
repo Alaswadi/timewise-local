@@ -338,7 +338,7 @@
             "selectTask": "اختر مهمة (اختياري)",
             "date": "التاريخ",
             "duration": "المدة",
-            "durationPlaceholder": "مثال: 2:30 أو 150 دقيقة",
+            "durationPlaceholder": "مثال: 1:30 (ساعة و30 دقيقة) أو 90 دقيقة",
             "startTime": "وقت البداية",
             "endTime": "وقت النهاية",
             "billable": "مدفوع",

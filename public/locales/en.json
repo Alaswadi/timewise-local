@@ -338,7 +338,7 @@
             "selectTask": "Select a task (optional)",
             "date": "Date",
             "duration": "Duration",
-            "durationPlaceholder": "e.g., 2:30 or 150 minutes",
+            "durationPlaceholder": "e.g., 1:30 (1h 30m) or 90 minutes",
             "startTime": "Start Time",
             "endTime": "End Time",
             "billable": "Billable",

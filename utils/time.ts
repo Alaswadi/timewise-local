@@ -233,29 +233,15 @@ export const parseDurationInput = (input: string): number | null => {
     // Try to parse as HH:MM format (e.g., "1:30" = 1 hour 30 minutes, "0:45" = 45 minutes)
     const timeMatch = trimmed.match(/^(\d{1,2}):(\d{1,2})$/);
     if (timeMatch) {
-        const firstNum = parseInt(timeMatch[1], 10);
-        const secondNum = parseInt(timeMatch[2], 10);
+        const hours = parseInt(timeMatch[1], 10);
+        const minutes = parseInt(timeMatch[2], 10);
 
-        // Smart interpretation based on the numbers:
-        // If first number > 12, treat as MM:SS (minutes:seconds)
-        // If first number <= 12 and second number <= 59, treat as HH:MM (hours:minutes)
-        if (firstNum > 12) {
-            // Treat as MM:SS (minutes:seconds)
-            const minutes = firstNum;
-            const seconds = secondNum;
-            if (minutes < 0 || minutes > 1440 || seconds < 0 || seconds > 59) { // Max 24 hours
-                return null;
-            }
-            return (minutes * 60 + seconds) * 1000; // Convert to milliseconds
-        } else {
-            // Treat as HH:MM (hours:minutes)
-            const hours = firstNum;
-            const minutes = secondNum;
-            if (hours < 0 || hours > 16 || minutes < 0 || minutes > 59) { // Max 16 hours per entry
-                return null;
-            }
-            return (hours * 60 + minutes) * 60 * 1000; // Convert to milliseconds
+        // For time tracking, limit to reasonable durations (max 16 hours per entry)
+        if (hours < 0 || hours > 16 || minutes < 0 || minutes > 59) {
+            return null;
         }
+
+        return (hours * 60 + minutes) * 60 * 1000; // Convert to milliseconds
     }
 
     // Try to parse as "Xh Ym" format (e.g., "8h 30m", "2h 0m")
@@ -426,22 +412,14 @@ export const createTimestampsFromDateAndDuration = (
     duration: number,
     startTime?: string
 ): { startTimestamp: number; endTimestamp: number } | null => {
-    console.log('🕐 Creating timestamps from:', { date, duration, startTime });
-
     const baseDate = new Date(date);
-    if (isNaN(baseDate.getTime())) {
-        console.log('❌ Invalid base date');
-        return null;
-    }
+    if (isNaN(baseDate.getTime())) return null;
 
     let startTimestamp: Date;
 
     if (startTime) {
         const startMinutes = parseTimeInput(startTime);
-        if (startMinutes === null) {
-            console.log('❌ Invalid start time');
-            return null;
-        }
+        if (startMinutes === null) return null;
 
         startTimestamp = new Date(baseDate);
         startTimestamp.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
@@ -452,12 +430,6 @@ export const createTimestampsFromDateAndDuration = (
     }
 
     const endTimestamp = new Date(startTimestamp.getTime() + duration);
-
-    console.log('✅ Created timestamps:', {
-        start: startTimestamp.toISOString(),
-        end: endTimestamp.toISOString(),
-        durationHours: duration / (1000 * 60 * 60)
-    });
 
     return {
         startTimestamp: startTimestamp.getTime(),
